@@ -205,6 +205,57 @@ feature -- Basic operations
 			print ("%N")
 		end
 
+	pwm_motor_run (a_count: INTEGER_32)
+			-- Control a dc motor with PWM.
+			-- This uses a clock and PWM.
+		local
+			i: INTEGER_32
+			v: NATURAL_32
+			n: NATURAL_32
+		do
+			print ("%N")
+			print ("DEMO.pwm_motor_run %N")
+			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			pi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
+			pi.pwm.enable_channel (0, 1)
+			pi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			pi.pin_18.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
+			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			pi.pwm.show (0, 1)
+				-- Set up
+
+				-- Do it `a_count' times
+			from i := 1
+			until i > a_count
+			loop
+				n := pi.pwm.range (0, 1)
+				from v := 0
+				until v > n
+				loop
+					pi.pwm.set_data (0, 1, v)	-- sets data register
+--					pi.pwm.show (0, 1)
+					v := v + 1
+					sleep
+				end
+					-- Decrease brightness
+				from v := n
+				until v <= 0
+				loop
+					pi.pwm.set_data (0, 1, v)	-- sets data register
+--					pi.pwm.show (0, 1)
+					v := v - 1
+					sleep
+				end
+				i := i + 1
+					-- For competeness, go down to zero
+				pi.pwm.set_data (0, 1, 0)		-- sets data register
+			end
+			pi.pwm.disable_channel (0, 1)
+			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			print ("%N")
+		end
+
 feature {NONE} -- Implementation
 
 	Sleep
