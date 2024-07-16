@@ -238,18 +238,6 @@ feature -- Basic operations
 					v := v + 1
 					sleep
 				end
-					-- Decrease brightness
-				from v := n
-				until v <= 0
-				loop
-					pi.pwm.set_data (0, 1, v)	-- sets data register
---					pi.pwm.show (0, 1)
-					v := v - 1
-					sleep
-				end
-				i := i + 1
-					-- For competeness, go down to zero
-				pi.pwm.set_data (0, 1, 0)		-- sets data register
 			end
 			pi.pwm.disable_channel (0, 1)
 			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)

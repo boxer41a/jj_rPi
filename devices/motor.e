@@ -34,21 +34,166 @@ create
 
 feature {NONE} -- Implementation
 
-	connect (a_pwm_pin, a_input_1, a_input_2: GPIO_PIN)
+	connect (a_pwm_pin, a_pin_1, a_pin_2: GPIO_PIN)
 			-- Create an instance where the value on `a_pwm_pin'
-			-- controls the `speed' and the values on `a_input_1'
-			-- and `a_input_2' controls the direction
+			-- controls the `speed' and the values on `a_pin_1'
+			-- and `a_pin_2' controls the direction
 		require
-			is_pwm_pin: a_pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_0 or else
-							a_pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_1 or else
+			is_pwm_pin: a_pwm_pin.is_set_for_pwm
+			pin_1_is_output: a_input_1.mode = {GPIO_PIN_CONSTANTS}.output
+			pin_2_is_output: a_input_2.mode = {GPIO_PIN_CONSTANTS}.output
 		do
-
+			pwm_pin := a_pwm_pin
+			pin_1 := a_pin_1
+			pin_2 := a_pin_2
 		end
 
 feature -- Access
 
+	pwm_pin: GPIO_PIN
+			-- The GPIO pin connected to one of the enable terminals
+			-- of the L293D motor-control chip.  This pin sends the PWM
+			-- pulse from the Raspberry Pi.
+
+	pin_1: GPIO_PIN
+			-- One of the two GPIO pins connected to one of the input
+			-- terminals of the L293D motor-control chip.
+
+	pin_2: GPIO_PIN
+			-- One of the two GPIO pins connected to one of the input
+			-- terminals of the L293D motor-control chip.
+
+	speed: NATURAL_32
+			-- The speed as a percent of the motor's maximum speed at
+			-- which it should run if not `is_stopped'
+
+	pwm_channel: INTEGER
+			-- The pwm channel used by Current
+			-- Convenience feature to access attribute of `pwm_pin'
+		require
+			is_pwm_pin: a_pwm_pin.is_set_for_pwm
+		do
+			Result := pwm_pin.pwm_channel
+		ensure
+			valid_result: Result = 0 or else Result = 1
+			sefinition: Result = pwm_pin.pwm_channel
+			definition_zero: Result = 0 implies pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+											pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_1
+			definition_one: Result = 1 implies pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm1_0 or
+											pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm1_1
+		end
+
+	pwm_index: INTEGER
+			-- PWM number 0 or 1 in use of the `pwm_channel'
+			-- Convenience feature to access attribute of `pwm_pin'
+		require
+			is_pwm_pin: a_pwm_pin.is_set_for_pwm
+		do
+			Result := pwm_pin.pwm_index
+		ensure
+			valid_result: Result = 0 or else Result = 1
+			sefinition: Result = pwm_pin.pwm_index
+			definition_zero: Result = 0 implies pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+											pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm1_1
+			definition_one: Result = 1 implies pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_1 or
+											pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm1_1
+		end
+
+feature -- Element change
+
+	set_pwm_pin (a_pin: GPIO_PIN)
+			-- Set the `pwm_pin'
+		require
+			is_pwm_pin: a_pwm_pin.is_set_for_pwm
+		do
+			pwm_pin := a_pin
+			if pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+					pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm0_1 then
+				pwm_channel := 0
+			else
+				check
+					is_channel_one: pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm1_0 or
+									 pwm_pin.function = {GPIO_PIN_CONSTANTS}.pwm1_1
+						-- because of precondition		
+				end
+				pwm_channel := 1
+			end
+		ensure
+			pin_assigned: pwm_pin = a_pin
+		end
+
+	set_speed (a_speed: INTEGER_32)
+			-- Set the `speed' (in percent of the motore's max speed) at
+			-- which the motore should run when it is running
+		require
+			speed_fast_enough: a_speed >= 0
+			speed_slow_enough: a_speed <= 100
+		do
+			speed := a_speed
+		ensure
+			assigned: speed = a_speed
+		end
+
+feature -- Status report
+
+	is_running: BOOLEAN
+			-- Should the motor be running?
+			-- True if the state of `input_pin_1' and `input_pin_2' are
+			-- both High or both Low.
+		do
+			Result := not is_stopped
+		ensure
+			definition: not is_stopped
+		end
+
+	is_stopped: BOOLEAN
+			-- Should the motor be stopped?
+		do
+			Result := input_pin_1.state = input_pin_2.state
+		ensure
+			definition: Result implies input_pin_1.state = input_pin_2 or speed = 0
+		end
+
+	is_reversed: BOOLEAN
+			-- Is the motor running in reverse (arbitrarily picked).
+		do
+			Result := input_pin_1.state = {GPIO_PIN_CONSTANTS}.Low and input_pin_2.state = {GPIO_PIN_CONSTANTS}.High
+		ensure
+			definition: Result implies input_pin_1.state = {GPIO_PIN_CONSTANTS}.Low and input_pin_2.state = {GPIO_PIN_CONSTANTS}.High
+		end
 
 feature -- Basic operations
+
+	run_forward
+			-- Ensure the motor runs in the forward direction at
+			-- its current `speed'
+		do
+			pin_1.set_state ({GPIO_PIN_CONSTANTS}.High)
+			pin_2.set_state ({GPIO_PIN_CONSTANTS}.Low)
+		ensure
+			is_running: is_running
+			not_reversed: not is_reversed
+		end
+
+	run_backward
+			-- Ensure the motor runs in the backward direction at
+			-- its current speed
+		do
+			pin_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
+			pin_2.set_state ({GPIO_PIN_CONSTANTS}.High)
+		ensure
+			is_running: is_running
+			not_reversed: not is_reversed
+		end
+
+feature -- Query
+
+
+feature {NONE} -- Implementation
+
+invariant
+	
+	is_pwm_pin: pwm_pin.is_set_for_pwm
 
 
 end

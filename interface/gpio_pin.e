@@ -11,7 +11,7 @@ class
 inherit
 
 	ANY
-	
+
 	SHARED
 		export
 			{NONE}
@@ -155,6 +155,76 @@ feature -- Query
 			-- Does Current support `a_function'?
 		do
 			Result := function_table.has_item (a_function)
+		end
+
+	has_pwm_function: BOOLEAN
+			-- Can Current support PWM?
+		do
+			Result := has_function ({GPIO_PIN_CONSTANTS}.pwm0_0) or else
+						has_function ({GPIO_PIN_CONSTANTS}.pwm0_1) or else
+						has_function ({GPIO_PIN_CONSTANTS}.pwm1_0) or else
+						has_function ({GPIO_PIN_CONSTANTS}.pwm1_1)
+		end
+
+	is_set_for_pwm: BOOLEAN
+			-- Is `function' set to one of the PWM channels?
+		local
+			f: like {GPIO_PIN_CONSTANTS}.pwm0_0
+		do
+			f := function
+			Result := f = {GPIO_PIN_CONSTANTS}.pwm0_0 or else
+						f = {GPIO_PIN_CONSTANTS}.pwm0_1 or else
+						f = {GPIO_PIN_CONSTANTS}.pwm1_0 or else
+						f = {GPIO_PIN_CONSTANTS}.pwm1_1
+		end
+
+	pwm_channel: INTEGER
+			-- The PWM channel this pin, if `is_set_for_pwm', is using
+		require
+			is_pwm: is_set_for_pwm
+		do
+			if function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+					function = {GPIO_PIN_CONSTANTS}.pwm0_1 then
+				Result := 0
+			else
+				check
+					is_channel_one: function = {GPIO_PIN_CONSTANTS}.pwm1_0 or
+									 function = {GPIO_PIN_CONSTANTS}.pwm1_1
+						-- because of precondition		
+				end
+				Result := 1
+			end
+		ensure
+			valid_result: Result = 0 or else Result = 1
+			definition_zero: Result = 0 implies function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+											function = {GPIO_PIN_CONSTANTS}.pwm0_1
+			definition_zero: Result = 1 implies function = {GPIO_PIN_CONSTANTS}.pwm1_0 or
+											function = {GPIO_PIN_CONSTANTS}.pwm1_1
+		end
+
+	pwm_index: INTEGER
+			-- The PWM index of the `pwm_channel' in use by Current,
+			-- if `is_set_for_pwm'
+		require
+			is_pwm: is_set_for_pwm
+		do
+			if function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+					function = {GPIO_PIN_CONSTANTS}.pwm1_0 then
+				Result := 0
+			else
+				check
+					is_index_one: function = {GPIO_PIN_CONSTANTS}.pwm0_1 or
+									 function = {GPIO_PIN_CONSTANTS}.pwm1_1
+						-- because of precondition		
+				end
+				Result := 1
+			end
+		ensure
+			valid_result: Result = 0 or else Result = 1
+			definition_zero: Result = 0 implies function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+											function = {GPIO_PIN_CONSTANTS}.pwm1_0
+			definition_zero: Result = 1 implies function = {GPIO_PIN_CONSTANTS}.pwm0_1 or
+											function = {GPIO_PIN_CONSTANTS}.pwm1_1
 		end
 
 feature -- Basic operations
