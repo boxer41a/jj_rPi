@@ -185,20 +185,20 @@ feature -- Query
 		do
 			if function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
 					function = {GPIO_PIN_CONSTANTS}.pwm0_1 then
-				Result := 0
+				Result := 1
 			else
 				check
 					is_channel_one: function = {GPIO_PIN_CONSTANTS}.pwm1_0 or
 									 function = {GPIO_PIN_CONSTANTS}.pwm1_1
 						-- because of precondition		
 				end
-				Result := 1
+				Result := 2
 			end
 		ensure
-			valid_result: Result = 0 or else Result = 1
-			definition_zero: Result = 0 implies function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
+			valid_result: Result = 1 or else Result = 2
+			definition_zero: Result = 1 implies function = {GPIO_PIN_CONSTANTS}.pwm0_0 or
 											function = {GPIO_PIN_CONSTANTS}.pwm0_1
-			definition_zero: Result = 1 implies function = {GPIO_PIN_CONSTANTS}.pwm1_0 or
+			definition_zero: Result = 2 implies function = {GPIO_PIN_CONSTANTS}.pwm1_0 or
 											function = {GPIO_PIN_CONSTANTS}.pwm1_1
 		end
 

@@ -127,8 +127,8 @@ feature -- Status setting
 				-- Wait for the busy bit to actually clear
 			wait (100, agent is_busy)
 		ensure
-			is_enabled: not is_enabled
-			is_running: not is_busy
+			not_enabled: not is_enabled
+			not_running: not is_busy
 		end
 
 	flip
@@ -173,7 +173,7 @@ feature -- Element change
 
 	set_mash (a_mash: NATURAL_32)
 			-- Set the MASH (Multi-stAge noise SHaping) noise-shaping divider to
-			-- `a_mash' in order to "push fractional divider jitter out of the 
+			-- `a_mash' in order to "push fractional divider jitter out of the
 			-- audio band.
 			-- Set up the MASH filter before enabling Current.
 			-- See http://www.aholme.co.uk/Frac2/Mash.htm, for example.
