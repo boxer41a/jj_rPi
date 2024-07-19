@@ -131,7 +131,7 @@ feature -- Status report
 		do
 			Result := not is_stopped
 		ensure
--- 			definition: not is_stopped
+ 			definition: not is_stopped
 		end
 
 	is_stopped: BOOLEAN
@@ -139,7 +139,7 @@ feature -- Status report
 		do
 			Result := pin_1.state = pin_2.state
 		ensure
---			definition: Result implies (pin_1.state = pin_2.state or speed = 0)
+			definition: Result implies pin_1.state = pin_2.state
 		end
 
 	is_reversed: BOOLEAN
@@ -156,8 +156,20 @@ feature -- Basic operations
 			-- Ensure the motor runs in the forward direction at
 			-- its current `speed'
 		do
+			print ("{MOTOR.run_forward:  ")
+			if pin_1 = pin_2 then
+				print ("same pins")
+			else
+				print ("two different pins")
+			end
+			print ("%N")
+			print ("{MOTOR.run_forward:  pin_1 = " + pin_1.state.out + "%N")
 			pin_1.set_state ({GPIO_PIN_CONSTANTS}.High)
+			print ("{MOTOR.run_forward:  pin_1 = " + pin_1.state.out + "%N")
+			print ("{MOTOR.run_forward:  pin_2 = " + pin_2.state.out + "%N")
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.Low)
+			print ("{MOTOR.run_forward:  pin_1 = " + pin_1.state.out + "%N")
+			print ("{MOTOR.run_forward:  pin_2 = " + pin_2.state.out + "%N")
 		ensure
 			not_reversed: not is_reversed
 			is_running: speed > 0 implies is_running
@@ -210,6 +222,8 @@ feature {NONE} -- Implementation
 invariant
 
 	is_pwm_pin: pwm_pin.is_set_for_pwm
+	pin_1_is_output_mode: pin_1.mode = {GPIO_PIN_CONSTANTS}.Output
+	pin_2_is_output_mode: pin_2.mode = {GPIO_PIN_CONSTANTS }.Output
 
 
 end

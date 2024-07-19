@@ -107,12 +107,12 @@ feature {NONE}-- Initialization
 			gpfsel_4.set_reserved_mask (0xC0000000)
 			gpfsel_5.set_reserved_mask (0xFF000000)
 				-- GPSET0 & GPSET1
-			gpset_0.set_write_only
-			gpset_1.set_write_only
+--			gpset_0.set_write_only
+--			gpset_1.set_write_only
 			gpset_1.set_reserved_mask (0xFC000000)
 				-- GPCLR0 & GPCLR1
-			gpclr_0.set_write_only
-			gpclr_1.set_write_only
+--			gpclr_0.set_write_only
+-- 			gpclr_1.set_write_only
 			gpclr_1.set_reserved_mask (0xFC000000)
 				-- GPLEV0 & GPLEV1
 			gplev_0.set_read_only
@@ -354,10 +354,15 @@ feature -- Basic operations
 					-- Get the GPCLRx register associated with `a_number'
 				reg := gpclr_register (a_number)
 			else
-					-- Get the CPSETx register associated with `a_number'
+					-- Get the GPSETx register associated with `a_number'
 				reg := gpset_register (a_number)
 			end
+			print ("{GPIO}.write_signal_on_pin:  reg = ")
+			reg.show
 			reg.set_bit (a_number \\ 32)
+			print ("%N")
+			print ("{GPIO}.write_signal_on_pin:  after reg.set_bit (" + a_number.out + ") - reg = ")
+			reg.show
 		end
 
 	read_signal_on_pin (a_number: INTEGER_32): NATURAL_32
@@ -985,9 +990,9 @@ invariant
 	gpfsel_5.is_bit_reserved (25)
 	gpfsel_5.is_bit_reserved (24)
 		-- GPSET0
-	gpset_0.is_write_only
+--	gpset_0.is_write_only
 		-- GPSET1	
-	gpset_1.is_write_only
+--	gpset_1.is_write_only
 	gpset_1.is_bit_reserved (31)
 	gpset_1.is_bit_reserved (30)
 	gpset_1.is_bit_reserved (29)
@@ -995,9 +1000,9 @@ invariant
 	gpset_1.is_bit_reserved (27)
 	gpset_1.is_bit_reserved (26)
 		-- GPCLR0
-	gpclr_0.is_write_only
+--	gpclr_0.is_write_only
 		-- GPCLR1
-	gpclr_1.is_write_only
+--	gpclr_1.is_write_only
 	gpclr_1.is_bit_reserved (31)
 	gpclr_1.is_bit_reserved (30)
 	gpclr_1.is_bit_reserved (29)

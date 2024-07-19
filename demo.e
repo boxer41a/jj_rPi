@@ -20,11 +20,11 @@ feature {NONE} -- Initialization
 		do
 			clear_screen
 			pi.show_revision_information
-			chap_1_led (5)
+--			chap_1_led (5)
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
 			if not pi.is_degraded_mode then
-				chap_4_pwm_led (1)
+--				chap_4_pwm_led (1)
 				pwm_motor_run (1)
 			end
 				-- Run test routines
