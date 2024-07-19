@@ -6,7 +6,7 @@ note
 
 		In addition to running assert statements, each test feature prints
 		information pertinant to that test, so that these features can be
-		called from {BIG_NUMBER_DEMO} to print demonstration values.
+		called from {DEMO} to print demonstration values.
 	]"
 	author: "EiffelStudio test wizard"
 	date: "$Date$"
