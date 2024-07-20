@@ -29,76 +29,46 @@ feature {NONE}-- Initialization
 				-- Precursor sets the `base_address'
 			Precursor {PERIPHERAL} (a_file_descriptor, a_length, a_address)
 				-- GPFSELx registers
-			create gpfsel_0.make (base_address + 0x00)
-			create gpfsel_1.make (base_address + 0x04)
-			create gpfsel_2.make (base_address + 0x08)
-			create gpfsel_3.make (base_address + 0x0C)
-			create gpfsel_4.make (base_address + 0x10)
-			create gpfsel_5.make (base_address + 0x14)
-			gpfsel_0.set_name ("GPFSEL0")
-			gpfsel_1.set_name ("GPFSEL1")
-			gpfsel_2.set_name ("GPFSEL2")
-			gpfsel_3.set_name ("GPFSEL3")
-			gpfsel_4.set_name ("GPFSEL4")
-			gpfsel_5.set_name ("GPFSEL5")
+			create gpfsel_0.make (base_address + 0x00, "GPFSEL0")
+			create gpfsel_1.make (base_address + 0x04, "GPFSEL1")
+			create gpfsel_2.make (base_address + 0x08, "GPFSEL2")
+			create gpfsel_3.make (base_address + 0x0C, "GPFSEL3")
+			create gpfsel_4.make (base_address + 0x10, "GPFSEL4")
+			create gpfsel_5.make (base_address + 0x14, "GPFSEL5")
 				-- reserved  0x18
-			create gpset_0.make (base_address + 0x1C)
-			create gpset_1.make (base_address + 0x20)
-			gpset_0.set_name ("GPSET0")
-			gpset_1.set_name ("GPSET1")
+			create gpset_0.make (base_address + 0x1C, "GPSET0")
+			create gpset_1.make (base_address + 0x20, "GPSET1")
 				-- reserved  0x24
-			create gpclr_0.make (base_address + 0x28)
-			create gpclr_1.make (base_address + 0x2C)
-			gpclr_0.set_name ("GPCLR0")
-			gpclr_1.set_name ("GPCLR1")
+			create gpclr_0.make (base_address + 0x28, "GPCLR0")
+			create gpclr_1.make (base_address + 0x2C, "GPCLR1")
 				-- reserved  0x30
-			create gplev_0.make (base_address + 0x34)
-			create gplev_1.make (base_address + 0x38)
-			gplev_0.set_name ("GP_LEV0")
-			gplev_1.set_name ("GP_LEV1")
+			create gplev_0.make (base_address + 0x34, "GP_LEV0")
+			create gplev_1.make (base_address + 0x38, "GP_LEV1")
 				-- reserved  0x3C
-			create gpeds_0.make (base_address + 0x40)
-			create gpeds_1.make (base_address + 0x44)
-			gpeds_0.set_name ("GPEDS0")
-			gpeds_1.set_name ("GPEDS1")
+			create gpeds_0.make (base_address + 0x40, "GPEDS0")
+			create gpeds_1.make (base_address + 0x44, "GPEDS1")
 				-- reserved  0x48
-			create gpren_0.make (base_address + 0x4C)
-			create gpren_1.make ( base_address + 0x50)
-			gpren_0.set_name ("GPREN0")
-			gpren_1.set_name ("GPREN1")
+			create gpren_0.make (base_address + 0x4C, "GPREN0")
+			create gpren_1.make ( base_address + 0x50, "GPREN1")
 				-- reserved  0x54
-			create gpfen_0.make (base_address + 0x58)
-			create gpfen_1.make (base_address + 0x5C)
-			gpfen_0.set_name ("GPFEN0")
-			gpfen_1.set_name ("GPFEN1")
+			create gpfen_0.make (base_address + 0x58, "GPFEN0")
+			create gpfen_1.make (base_address + 0x5C, "GPFEN1")
 				-- reserved  0x60
-			create gphen_0.make (base_address + 0x64)
-			create gphen_1.make (base_address + 0x68)
-			gphen_0.set_name ("GPHEN0")
-			gphen_1.set_name ("GPHEN1")
+			create gphen_0.make (base_address + 0x64, "GPHEN0")
+			create gphen_1.make (base_address + 0x68, "GPHEN1")
 				-- reserved  0x6C
-			create gplen_0.make (base_address + 0x70)
-			create gplen_1.make (base_address + 0x74)
-			gplen_0.set_name ("GPLEN0")
-			gplen_1.set_name ("GPLEN1")
+			create gplen_0.make (base_address + 0x70, "GPLEN0")
+			create gplen_1.make (base_address + 0x74, "GPLEN1")
 				-- reserved  0x78
-			create gparen_0.make (base_address + 0x7C)
-			create gparen_1.make (base_address + 0x80)
-			gparen_0.set_name ("GPAREN0")
-			gparen_1.set_name ("GPAREN1")
+			create gparen_0.make (base_address + 0x7C, "GPAREN0")
+			create gparen_1.make (base_address + 0x80, "GPAREN1")
 				-- reserved  0x84			
-			create gpafen_0.make (base_address + 0x88)
-			create gpafen_1.make (base_address + 0x8C)
-			create gpio_pup_pdn_cntrl_reg0.make (base_address + 0xE4)
-			create gpio_pup_pdn_cntrl_reg1.make (base_address + 0xE8)
-			create gpio_pup_pdn_cntrl_reg2.make (base_address + 0xEC)
-			create gpio_pup_pdn_cntrl_reg3.make (base_address + 0xF0)
-			gpafen_0.set_name ("GPAFEN0")
-			gpafen_1.set_name ("GPAFEN1")
-			gpio_pup_pdn_cntrl_reg0.set_name ("GPIO_PUP_PDN_CNTRL_REG0")
-			gpio_pup_pdn_cntrl_reg1.set_name ("GPIO_PUP_PDN_CNTRL_REG1")
-			gpio_pup_pdn_cntrl_reg2.set_name ("GPIO_PUP_PDN_CNTRL_REG2")
-			gpio_pup_pdn_cntrl_reg3.set_name ("GPIO_PUP_PDN_CNTRL_REG3")
+			create gpafen_0.make (base_address + 0x88, "GPAFEN0")
+			create gpafen_1.make (base_address + 0x8C, "GPAFEN1")
+			create gpio_pup_pdn_cntrl_reg0.make (base_address + 0xE4, "GPIO_PUP_PDN_CNTRL_REG0")
+			create gpio_pup_pdn_cntrl_reg1.make (base_address + 0xE8, "GPIO_PUP_PDN_CNTRL_REG1")
+			create gpio_pup_pdn_cntrl_reg2.make (base_address + 0xEC, "GPIO_PUP_PDN_CNTRL_REG2")
+			create gpio_pup_pdn_cntrl_reg3.make (base_address + 0xF0, "GPIO_PUP_PDN_CNTRL_REG3")
 				-- GPFSEL0 to GPFSEL5
 			gpfsel_0.set_reserved_mask (0xC0000000)
 			gpfsel_1.set_reserved_mask (0xC0000000)
@@ -140,25 +110,6 @@ feature {NONE}-- Initialization
 --			test_register_temp
 		end
 
-
-	test_register_temp
-			-- Assign some value to a register to see if working.
-			-- The PWM range register was not taking values above 24 bits
-		local
-			reg: like gpfsel_0
-			n: NATURAL_32
-		do
-			reg := gpfsel_0		-- just picked one
-			from n := 0
-			until n > 1000
-			loop
-				reg.set_value (n)
-				print ("   " + n.out + ":  " + reg.value.out + "%N")
-				n := n + 1
-			end
-		end
-
-
 feature -- Access
 
 
@@ -169,18 +120,6 @@ feature -- Query
 		do
 			Result := a_number >= pi.pin_0.number and a_number <= pi.pin_last.number
 		end
-
---	is_valid_pin_number (a_number: INTEGER_32): BOOLEAN
---			-- Is pin number `a_number' valid for this Pi?
---		do
---			Result := pin_function_table.has_key (a_number)
---		end
-
---	is_valid_mode_on_pin (a_number: INTEGER_32; a_mode: NATURAL_32): BOOLEAN
---			-- Is `a_number' allowed to use `a_mode'
---		do
---			Result := pin_function_table.has_keys (a_number, a_mode)
---		end
 
 	pull_state_on_pin (a_number: INTEGER): NATURAL_32
 			-- The pull-up/down state of `a_number'
@@ -612,8 +551,7 @@ feature {NONE} -- Implementation
 					should_not_happen: false
 						-- because there are only 58 gpio pins
 				end
-				create Result.make (base_address)
-				Result.set_name ("Error")
+				create Result.make (base_address, "Error")
 			end
 		end
 

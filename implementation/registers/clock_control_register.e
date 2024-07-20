@@ -20,16 +20,19 @@ inherit
 inherit {NONE}
 
 	GPIO_CLOCK_CONSTANTS
+		undefine
+			is_equal
+		end
 
 create
 	make
 
 feature {NONE} -- Initialization
 
-	make (a_pointer: POINTER)
+	make (a_pointer: POINTER; a_name: like name)
 			-- Create an instance
 		do
-			Precursor {REGISTER} (a_pointer)
+			Precursor {REGISTER} (a_pointer, a_name)
 			require_password
 			set_reserved_mask (0x00FFF840)	-- (11..23 & 6)
 			set_write_only_mask (password_mask)

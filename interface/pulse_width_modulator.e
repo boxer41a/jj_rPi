@@ -18,23 +18,14 @@ feature {NONE} -- Initialization
 			-- Set up Current, creating the registers
 		do
 				-- create register
-			create pwm_control.make (a_address + 0x00)
-			create pwm_status.make (a_address + 0x04)
-			create pwm_dmac.make (a_address + 0x08)
-			create pwm_channel_1_range.make (a_address + 0x10)
-			create pwm_channel_1_data.make (a_address + 0x14)
-			create pwm_fifo_input.make (a_address + 0x18)
-			create pwm_channel_2_range.make (a_address + 0x20)
-			create pwm_channel_2_data.make (a_address + 0x24)
-				-- name the registers
-			pwm_control.set_name ("CTL")
-			pwm_status.set_name ("STA")
-			pwm_dmac.set_name ("DMAC")
-			pwm_channel_1_range.set_name ("RNG1")
-			pwm_channel_1_data.set_name ("DAT1")
-			pwm_fifo_input.set_name ("FIF1")
-			pwm_channel_2_range.set_name ("RNG2")
-			pwm_channel_2_data.set_name ("DAT2")
+			create pwm_control.make (a_address + 0x00, "CTL")
+			create pwm_status.make (a_address + 0x04, "STA")
+			create pwm_dmac.make (a_address + 0x08, "DMAC")
+			create pwm_channel_1_range.make (a_address + 0x10, "RNG1")
+			create pwm_channel_1_data.make (a_address + 0x14, "DAT1")
+			create pwm_fifo_input.make (a_address + 0x18, "FIF1")
+			create pwm_channel_2_range.make (a_address + 0x20, "RNG2")
+			create pwm_channel_2_data.make (a_address + 0x24, "DAT2")
 				-- CTL
 			pwm_control.set_reserved_mask (0xFFFF4000) -- bits 14,16..31
 			pwm_control.set_bit_write_once (6)

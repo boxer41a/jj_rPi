@@ -1,7 +1,6 @@
 note
 	description: "[
 		Represents a register in a {PI_CONTROLLER}.
-
 		Current can be read-write (RW), read-only (RO), or write-only (WO).
 
 		Also, individual bits can be set as read-write (RW), read-only (RO),
@@ -21,25 +20,35 @@ note
 class
 	REGISTER
 
+--inherit {NONE}
+
+--	SHARED
+--		export
+--			{NONE}
+--				all
+--			{ANY}
+--				pi
+--		undefine
+--			is_equal
+--		end
+
 create
 	make
 
 feature {NONE} -- Initialization
 
-	make (a_pointer: POINTER)
+	make (a_pointer: POINTER; a_name: like name)
 			-- Set up the register
 		do
 			pointer := a_pointer
-			name := "not named"
+				-- Use copy to avoid an accidental name change
+			name := a_name.twin
 		end
 
 feature -- Access
 
 	name: STRING_8
 			-- A printable name for Current (e.g. GPFSEL0, GPLEV0, etc)
---		attribute
---			Result := "No name"
---		end
 
 	value: NATURAL_32
 			-- The 32-bit value referenced by Current

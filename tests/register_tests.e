@@ -23,16 +23,23 @@ inherit
 			on_prepare
 		end
 
+	JJ_TEST_ROUTINES
+		undefine
+			default_create
+		end
+
+	SHARED
+		undefine
+			default_create
+		end
+
 feature {NONE} -- Events
 
 	on_prepare
 			-- Called after all initializations in `default_create'.
 			-- Redefined to set `test_limit' for auto-testing.
 		do
---			test_limit := Default_test_limit
---			word_limit := Default_word_limit
---			digit_limit := Default_digit_limit
---			power_limit := Default_power_limit
+			add_valid_target_type ("REGISTER")
 		end
 
 feature -- Constants
@@ -43,6 +50,14 @@ feature -- Basic operations
 			-- Demo/test all features
 		do
 
+		end
+
+
+	test
+			-- Pick a register from the `pi' and run test on it
+		local
+			r: REGISTER
+		do
 		end
 
 feature -- Implementation

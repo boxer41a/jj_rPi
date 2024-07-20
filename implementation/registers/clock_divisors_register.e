@@ -24,10 +24,10 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_pointer: POINTER)
+	make (a_pointer: POINTER; a_name: like name)
 			-- Create an instance
 		do
-			Precursor {REGISTER} (a_pointer)
+			Precursor {REGISTER} (a_pointer, a_name)
 			require_password
 			set_write_only_mask (password_mask)
 				-- Set the integer part of the devisor to one (to

@@ -1,47 +1,37 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-22-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-22-0 http://www.eiffel.com/developers/xml/configuration-1-22-0.xsd" name="jj_rpi" uuid="8C23597B-BED1-4BD4-8E53-61153F818914">
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-21-0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-21-0 http://www.eiffel.com/developers/xml/configuration-1-21-0.xsd"
+name="jj_rpi"
+uuid="BDCE9BC9-0ABC-4395-8F0F-C85C2C0C623A"
+library_target="jj_rpi">
 	<target name="jj_rpi">
-		<root class="DEMO" feature="make"/>
+		<root all_classes="true"/>
 		<file_rule>
 			<exclude>/CVS$</exclude>
 			<exclude>/EIFGENs$</exclude>
 			<exclude>/\.git$</exclude>
 			<exclude>/\.svn$</exclude>
-			<exclude>/include$</exclude>
-			<exclude>/simulator$</exclude>
 		</file_rule>
-		<option warning="warning" is_obsolete_iteration="true" manifest_array_type="mismatch_warning">
+		<option warning="warning" manifest_array_type="mismatch_warning">
 			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
 		</option>
 		<setting name="console_application" value="true"/>
+		<setting name="total_order_on_reals" value="false"/>
 		<setting name="dead_code_removal" value="feature"/>
-		<capability>
-			<catcall_detection support="none"/>
-			<concurrency support="scoop"/>
-			<void_safety support="all"/>
-		</capability>
-		<external_include location="./include">
-			<description>C funtions to be used in the jj_RPi cluster</description>
-		</external_include>
-		<precompile name="base_pre" location="$ISE_PRECOMP\base-scoop-safe.ecf">
-			<option warning="none">
-			</option>
-		</precompile>
-		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf">
-			<option warning="none">
-			</option>
-		</library>
-		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf">
-			<option warning="none">
-			</option>
-		</library>
-		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf">
-			<option warning="none">
-			</option>
-		</library>
-		<cluster name="jj_rpi" location=".\" recursive="true">
-			<option warning="none" is_obsolete_iteration="true">
-			</option>
-		</cluster>
+		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf"/>
+		<cluster name="devices" location=".\devices\" recursive="true"/>
+		<cluster name="implementation" location=".\implementation\" recursive="true"/>
+		<cluster name="interface" location=".\interface\" recursive="true"/>
+	</target>
+	<target name="jj_rpi_tests" extends="jj_rpi">
+		<root class="APPLICATION" feature="make"/>
+		<option warning="warning">
+			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
+		</option>
+		<setting name="console_application" value="true"/>
+		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
+		<cluster name="test" location=".\testing\" recursive="true"/>
 	</target>
 </system>

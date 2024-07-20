@@ -71,12 +71,8 @@ feature {NONE} -- Initialization
 		local
 			s: STRING_8
 		do
-			create controller.make (a_address)
-			create divisor.make (a_address + 0x04)
-				-- Name the registers
-			s := "CM_" + a_name
-			controller.set_name (s + "CTL")
-			divisor.set_name (s + "DIV")
+			create controller.make (a_address, "CM_CTL")
+			create divisor.make (a_address + 0x04,"CM_DIV")
 		end
 
 feature -- Access
@@ -525,7 +521,7 @@ feature {NONE} -- Implementation
 
 	set_mash (a_mash: NATURAL_32)
 			-- Set the MASH (Multi-stAge noise SHaping) noise-shaping divider to
-			-- `a_mash' in order to "push fractional divider jitter out of the 
+			-- `a_mash' in order to "push fractional divider jitter out of the
 			-- audio band.
 			-- Set up the MASH filter before enabling Current.
 			-- See http://www.aholme.co.uk/Frac2/Mash.htm, for example.

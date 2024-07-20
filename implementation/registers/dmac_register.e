@@ -23,10 +23,10 @@ create
 
 feature {NONE} -- Implementation
 
-	make (a_pointer: POINTER)
+	make (a_pointer: POINTER; a_name: like name)
 			-- Set up the register
 		do
-			Precursor {REGISTER} (a_pointer)
+			Precursor {REGISTER} (a_pointer, a_name)
 			reset_panic_threshold
 			reset_dreq_threshold
 		ensure then
