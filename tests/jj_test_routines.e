@@ -11,16 +11,6 @@ deferred class
 
 feature -- Basic operations
 
-	add_valid_target_type (a_string: STRING_8)
-			-- Add the type given by `a_string' to the list of types
-			-- that these test routines can recognize.
-		local
-			t: INTEGER
-		do
-			t := reflector.dynamic_type_from_string (a_string)
-			valid_target_types.extend (t)
-		end
-
 	assert_32 (a_tag: READABLE_STRING_GENERAL; a_condition: BOOLEAN)
 			-- Assert `a_condition'.
 		deferred
@@ -31,25 +21,54 @@ feature -- Basic operations
 		deferred
 		end
 
-feature {NONE} -- Implementation
-
-	reflector: REFLECTOR
-			-- For getting and checking types
-		once
-			create Result
+	add_valid_target_type (a_string: STRING_8)
+			-- Add the type given by `a_string' to the list of types
+			-- that these test routines can recognize.
+		do
+			known_types.extend (a_string)
 		end
 
-	valid_target_types: LINKED_SET [INTEGER]
-			-- List of types that the tests can recognize
+feature {NONE} -- Implementation
+
+	divider (a_string: STRING_8)
+			-- Print a dividing line containing `a_string'
+			-- (e.g.  "----------- a_string ------------"
+		local
+			w, c, n, i: INTEGER_32
+		do
+			io.put_string ("%N%N%N")
+			w := 70
+			c := a_string.count
+			n := (w - c) // 2
+			from i := 1
+			until i > n
+			loop
+				io.put_string ("-")
+				i := i + 1
+			end
+			io.put_string (" " + a_string + " ")
+			from i := 1
+			until i > n
+			loop
+				io.put_string ("-")
+				i := i + 1
+			end
+			io.put_string ("%N")
+		end
+
+	known_types: TWO_WAY_SORTED_SET [STRING]
+			-- Table of known type names indexed by it type
 		attribute
 			create Result.make
+			Result.compare_objects
+			Result.extend ("INTEGER_32")
 		end
 
 	is_valid_target_type (a_routine: ROUTINE): BOOLEAN
 			-- Is the target of `a_routine' a type that this class can test?
 		do
 			Result := attached a_routine.target as t and then
-				(attached {REGISTER} t)
+				known_types.has (t.generating_type)
 			if not Result then
 					-- The check for attached like Current seems to handle the case where
 					-- `a_routine' is referencing an attribute.  In that case, the actual
@@ -57,7 +76,10 @@ feature {NONE} -- Implementation
 					-- argument as I would expect.
 				check attached a_routine.target as t then
 					check attached a_routine.closed_operands as args and then args.count >= 2 then
-						Result := (attached {REGISTER} args [2])
+						if attached args [2] as t2 then
+							print ("{JJ_TEST_ROUTINES}.is_vald_target_type:  t2.generating_type = '" + t2.generating_type.out + "'%N")
+							Result := known_types.has (t2.generating_type)
+						end
 					end
 				end
 			end
@@ -237,6 +259,10 @@ feature {NONE} -- Implementation
 			elseif attached {STRING} a_any as s then
 --				Result := Result + "%"" + s.out + "%""
 				Result := Result + s.out
+			elseif attached {INTEGER_32} a_any as i_32 then
+				Result := Result + i_32.out
+			elseif attached {NATURAL_32} a_any as n_32 then
+				Result := Result + "0x" + n_32.to_hex_string
 			else
 				Result := "Void"
 			end

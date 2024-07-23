@@ -63,8 +63,8 @@ print ("            generating_type of `a' is {" + a.generating_type + "} %N")
 				a := ("test_file").to_c
 				fd := c_open_file ($a)
 				create gpio.make (fd, gpio_map_length, 0)
-				create clocks_imp.make (fd, clocks_map_length, 0)
-				create pwm_imp.make (fd, pwm_map_length, 0)
+--				create clocks_imp.make (fd, clocks_map_length, 0)
+--				create pwm_imp.make (fd, pwm_map_length, 0)
 			elseif is_degraded_mode then
 					-- The GPIO is the only {PERIPHERAL} available
 				create gpio.make(fd, gpio_map_length, gpio_offset)

@@ -20,6 +20,7 @@ feature {NONE} -- Initialization
 		do
 			clear_screen
 			pi.show_revision_information
+			run_gpio_tests
 --			chap_1_led (5)
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
@@ -51,6 +52,17 @@ feature -- Basic operations
 				print ("%N")
 				i := i + 1
 			end
+		end
+
+	run_gpio_tests
+			-- Run test of the {GPIO} features
+		local
+			t: GPIO_TESTS
+		do
+			create t
+			t.test_pull_state_features
+			t.test_mode_features
+			t.test_signal_features
 		end
 
 	test_register
