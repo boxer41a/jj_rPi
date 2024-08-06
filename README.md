@@ -2,7 +2,8 @@
 
 ## An Eiffel Library for controlling a Raspberry Pi
 
-##Overview
+
+## Overview
 
 This library allows a user to control a Raspberry Pi using Eiffel.  (Include [jj_rpi.ecf](./jj_rpi.ecf) in a project.)  The library is written entirely in Eiffel, with a few in-line C routines to interface with the hardware.
 
@@ -12,7 +13,7 @@ The library is divided into three parts:  1) the [interface](./interface), the [
 
 <img src="./docs/Diagram.png" alt="drawing" width="100%"/>
 
-##Example (high-level)
+## Example (high-level)
 
 The system [rpi_demo.ecf](./demo/rpi_demo.ecf) uses [DEMO](./demo/demo.e) to show how to use some of the library's classes and features.  First notice that class [DEMO](./demo/demo.e) inherits from class [SHARED](./interface/shared.e), which provides access through feature *pi* to the one and only one [PI_CONTROLLER](./interface/pi_controller.e) in a system.  (At this time, the library supports only a [PI\_4\_CONTROLLER](./interface/pi_4_controller.e) but other controllers could be added.)  Class [PI_CONTROLLER](./interface/pi_controller.e) gives access to the Pi's [GPIO](./interface/peripherals/gpio.e), [CLOCKS](./interface/peripherals/clocks.e), and [PWM](./interface/peripherals/pwm.e) peripherals and to each [GPIO_PIN](./interface/gpio_pin.e).
 
@@ -44,7 +45,7 @@ Feature *chap\_1\_led* from class [DEMO](./demo/demo.e) illustrates some high-le
 ```
 This feature uses the output from pin number 18 to blink an [LED](./devices/led.e) *a_count* number of times.  Notice that *pin_18* from the *pi* is first set to *Output* mode in order to satisfy the precondition to the [LED](./devices/led.e) creation feature *connect*.  Inside the loop, the code calls features *turn_on* and *turn_off* from class [LED](./devices/led.e).
 
-##Example (drilling down)
+## Example (drilling down)
 Feature *turn_on* from class [LED](./devices/led.e) is a one-liner.
 
 ```
@@ -96,7 +97,7 @@ This call feature *write_signal_on_pin* from class [GPIO](./interface/peripheral
 ```
 The feature simply sets a pin's output to either high or low.  It accomplishes this by writing a one to the appropriate bit of a particular register.  To make a pin output High the feature writes a one to one of the two GPCLRn (GPIO Pin Output Set Registers); to clear a pin (i.e. make it go low or to zero volts) the feature writes a ONE to one of the two GPCLRn (GPIO Pin Output Clear Registers).  Information about these registers are in [Broadcom BCM2835 ARM Peripherals](./docs/BCM2835 ARM Peripherals.pdf).
 
-##Example (low-level)
+## Example (low-level)
 The last line of the code above *reg.set_bit (a_number \\ 32)* brings the example down to the low-level implementation details.  Feature *reg* is of type [REGISTER](./implementation/registers), a class that uses in-line C code to write directly to memeory locations.  Here is feature *set_bit*, which changes a single bit in a 32 bit memory location while leaving the other bits unchanged.
 
 ```
@@ -143,7 +144,8 @@ This drill-down into the details shows how this library hides many details that 
 
 One detail in the above code was avoided until now.  From where does the *pointer* passed as argument in *a_address: POINTER* to the two feature of the above C code originate? 
 
-##Back to the Top
+## Back to the Top
+
 The value of *pointer*, a feature of class [REGISTER](./implementation/registers), is assigned during creation from a *base_address + an_offset*.  The following code shows the creation calls for some of the registers of the [GPIO](./interface/peripherals/gpio.e) [PERIPHERAL](./interface/peripherals/peripheral.e), including creation of the GPSETn and GPCLRn registers discussed above.
 
 ```
