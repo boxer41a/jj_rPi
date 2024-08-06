@@ -19,11 +19,8 @@ feature {NONE} -- Initialization
 			-- Run application.
 		do
 			clear_screen
---			pi.pin_17.set_state (0)
---			pi.show_revision_information
+			pi.show_revision_information
 			chap_1_led (10)
---			run_register_tests
---			run_gpio_tests
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
 			if not pi.is_degraded_mode then
@@ -82,6 +79,7 @@ feature -- Basic operations
 			led: LED
 		do
 			print ("Blink an LED %N")
+			pi.pin_18.set_mode ({GPIO_PIN_CONSTANTS}.Output)
 			create led.connect (pi.pin_18)
 			from i := 1
 			until i > a_count
@@ -232,21 +230,22 @@ feature -- Basic operations
 		do
 			print ("%N")
 			print ("DEMO.pwm_motor_run %N")
-			enab := pi.pin_18
-			in_1 := pi.pin_12
-			in_2 := pi.pin_16
---			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
-				-- Set up
+				-- Set up clock and PWM
 			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 			pi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
 			pi.pwm.enable_channel (0, 1)
 			pi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+				-- For convenience, assign pins to local variables
+			enab := pi.pin_18
+			in_1 := pi.pin_12
+			in_2 := pi.pin_16
+				-- Set the enable pin to alt5 mode, which is PWM,
+				-- and the two control pins to output mode.
 			enab.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
 			in_1.set_mode ({GPIO_PIN_CONSTANTS}.output)
 			in_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
+				-- Create the {MOTOR} object
 			create mot.connect (enab, in_1, in_2)
---			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
---			pi.pwm.show (0, 1)
 				-- Do it `a_count' times
 			from i := 1
 			until i > a_count
@@ -261,8 +260,6 @@ feature -- Basic operations
 				until v > n
 				loop
 					mot.set_speed (v)
---					print ("moter speed = " + mot.speed.out + "%N")
---					pi.pwm.show (0, 1)
 					mot.show
 					v := v + 5
 					sleep
@@ -271,7 +268,6 @@ feature -- Basic operations
 				i := i + 1
 			end
 			mot.stop
-			mot.show
 			pi.pwm.disable_channel (0, 1)
 			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 			print ("%N")

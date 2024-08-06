@@ -146,6 +146,9 @@ feature -- Element change
 
 	 set_value (a_value: NATURAL_32)
 			-- Change the `value' stored in Current
+			-- A post-condition will not work, because some registers
+			-- are read-only or will be reset by the Pi after a value
+			-- is written to the register.
 		require
 			is_writable: is_writable
 			is_valid_value: is_valid_value (a_value)
@@ -157,19 +160,14 @@ feature -- Element change
 				-- be set to zero by the Pi after the write.
 				-- Does not matter if `password' bits are set in `a_value'
 				-- because we first clear them here then add the `password'
---	print ("{" + generating_type +"}.set_value (" + a_value.to_hex_string + "):  " + name + "%N")
---	print ("    filtered (a_value) = " + filtered (a_value).to_hex_string + "%N")
 			v := a_value
 			if is_password_required then
 				v := v.bit_and (password_mask.bit_not)
 				v := v.bit_or (password)
 			end
---	print ("    Calling `c_set_register_value (__, " + v.to_hex_string + ") %N")
 			c_set_register_value (pointer, v)
---	show
- --	print ("    filtered (value) = " + filtered (value).to_hex_string + "%N")
 		ensure
-			value_was_set: filtered (value) = a_value
+--			value_was_set: filtered (value) = a_value
 		end
 
 	show

@@ -16,9 +16,11 @@ feature {NONE} -- Initialization
 
 	connect (a_pin: GPIO_PIN)
 			-- Connect Current to `a_pin'
+		require
+			pin_is_output: a_pin.mode = {GPIO_PIN_CONSTANTS}.output
 		do
 			pin := a_pin
-			pin.set_mode ({GPIO_PIN_CONSTANTS}.output)
+--			pin.set_mode ({GPIO_PIN_CONSTANTS}.output)
 		end
 
 feature -- Access

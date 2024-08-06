@@ -138,7 +138,7 @@ feature -- Status report
 		do
 			Result := not is_stopped
 		ensure
- 			definition: not is_stopped
+ 			definition: Result implies not is_stopped
 		end
 
 	is_stopped: BOOLEAN
@@ -179,7 +179,7 @@ feature -- Basic operations
 			pin_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.High)
 		ensure
-			not_reversed: not is_reversed
+			not_reversed: is_reversed
 			is_running: speed > 0 implies is_running
 			pin_1_state: pin_1.state = {GPIO_PIN_CONSTANTS}.Low
 			pin_2_state: pin_2.state = {GPIO_PIN_CONSTANTS}.High

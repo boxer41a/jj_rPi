@@ -296,14 +296,7 @@ feature -- Basic operations
 					-- Get the GPSETx register associated with `a_number'
 				reg := gpset_register (a_number)
 			end
-			reg.reset
---			print ("{GPIO}.write_signal_on_pin:  reg = ")
---			reg.show
 			reg.set_bit (a_number \\ 32)
---			reg.show
---			print ("%N")
---			print ("{GPIO}.write_signal_on_pin:  after reg.set_bit (" + a_number.out + ") - reg = ")
---			reg.show 
 		end
 
 	read_signal_on_pin (a_number: INTEGER_32): NATURAL_32
