@@ -10,7 +10,7 @@ The library is divided into three parts:  1) the [interface](./interface), the [
 
 ### The Big Picture
 
-<img src="docs/diagram.png" alt="drawing" width="100%"/>
+<img src="./docs/Diagram.png" alt="drawing" width="100%"/>
 
 ###Example (high-level)
 
@@ -168,6 +168,7 @@ The value of *pointer*, a feature of class [REGISTER](./implementation/registers
 ```
 The offsets are giveing in [Broadcom BCM2835 ARM Peripherals](./docs/BCM2835 ARM Peripherals.pdf) and the base address is calculated by a call
 >*base\_address := c\_mmap (a\_file\_descriptor, a\_length, a\_address)*
+
 from class [PERIPHERAL](./interface/peripherals/peripheral.e).  The addresses ultimately come from feature *create\_interface\_objects* of class [PI_CONTROLLER](./interface/pi_controller.e) which attempts to open file "dev/mem" or file "/dev/gpiomen" and constants from class [PI\_4\_CONTROLLER](./interface/pi_4_controller.e).
 
 ```
