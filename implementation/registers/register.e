@@ -96,13 +96,29 @@ feature -- Access
 	Default_password: NATURAL_32 = 0x5A000000
 			-- Password used when setting some registers
 
-feature -- Element change
-
-	set_name (a_name: STRING_8)
-			-- Change the `name' to a copy of `a_name'
+	as_hex_string: STRING
+			-- The `value' displayed as a hex string
+			-- (e.g. "0xFF000071")
 		do
-			name.copy (a_name)
+			Result := "0x" + value.to_hex_string
 		end
+
+	as_binary_string: STRING
+			-- The `value' displayed as a binary string
+			-- (e.g. "0b11000000000000000000000001110001")
+		local
+			i: INTEGER
+		do
+			Result := "0b"
+			from i := 0
+			until i > 31
+			loop
+				Result.append (bit_value (i).out)
+				i := i + 1
+			end
+		end
+
+feature -- Element change
 
 	set_default_value (a_value: NATURAL_32)
 			-- Set the `default_value', the value to which Current is
@@ -117,13 +133,13 @@ feature -- Element change
 		local
 			v: NATURAL_32
 		do
-			print ("%N")
-			print ("{" + generating_type + "}.reset: %N")
-			print ("     name = " + name.out + "%N")
-			print ("     default_value = " + default_value.to_hex_string + "%N")
-			print ("     value before = " + value.to_hex_string + "%N")
+--			print ("%N")
+--			print ("{" + generating_type + "}.reset: %N")
+--			print ("     name = " + name.out + "%N")
+--			print ("     default_value = " + default_value.to_hex_string + "%N")
+--			print ("     value before = " + value.to_hex_string + "%N")
 			set_value (Default_value)
-			print ("     value after = " + value.to_hex_string + "%N")
+--			print ("     value after = " + value.to_hex_string + "%N")
 		ensure
 			value_was_reset: value = default_value
 		end
@@ -151,7 +167,7 @@ feature -- Element change
 --	print ("    Calling `c_set_register_value (__, " + v.to_hex_string + ") %N")
 			c_set_register_value (pointer, v)
 --	show
---	print ("    filtered (value) = " + filtered (value).to_hex_string + "%N")
+ --	print ("    filtered (value) = " + filtered (value).to_hex_string + "%N")
 		ensure
 			value_was_set: filtered (value) = a_value
 		end
@@ -178,8 +194,11 @@ feature -- Element change
 			v: NATURAL_32
 		do
 			v := c_register_value (pointer)
+--			print ("{REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
 			v := v.bit_or (pin_mask (a_index))
+--			print ("    {REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
 			c_set_register_value (pointer, v)
+--			print ("    {REGISTER}.set_bit:  value = " + value.to_hex_string + "%N")
 		end
 
 	clear_bit (a_index: INTEGER_32)

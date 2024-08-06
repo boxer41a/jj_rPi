@@ -77,7 +77,6 @@ feature {NONE} -- Implementation
 				check attached a_routine.target as t then
 					check attached a_routine.closed_operands as args and then args.count >= 2 then
 						if attached args [2] as t2 then
-							print ("{JJ_TEST_ROUTINES}.is_vald_target_type:  t2.generating_type = '" + t2.generating_type.out + "'%N")
 							Result := known_types.has (t2.generating_type)
 						end
 					end

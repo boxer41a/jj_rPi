@@ -8,7 +8,7 @@ note
 		
 		  ***********************
 		1 * Enable 1        VSS * 16
-		2 * Input_1     Input 4 * 15
+		2 * Input 1     Input 4 * 15
 		3 * Output 1   Output 4 * 14
 		4 * GND             GND * 13
 		5 * GND             GND * 12
@@ -18,9 +18,16 @@ note
 		  ***********************
 		
 		
-		 Wire this controller to
-		the Raspberry Pi as follows:
-		    VSS (pin 16) to 3.3V
+		 Wire this controller to the Raspberry Pi as follows:
+		    VSS (pin 16) to rPi 3.3V
+		    Enable 1 (pin 1) to an rPi PWM-enabled pin
+		    Input 1 (pin 2) to an rPi GPIO output pin
+		    Output 1 (pin 3) to one side of the motor
+		    GND (pin 4) to an rPi ground pin
+		    GND (pin 4) to negative side of motor power source
+		    Output 2 (pin6) to other side of the motor
+		    Input 2 (pin 7) to an other rPi GPIO output pin
+		    Vs (pin 8) to the positive side of the motor power source
 
 	]"
 	author: "Jimmy J Johnson"
@@ -152,24 +159,12 @@ feature -- Status report
 
 feature -- Basic operations
 
-	run_forward
+	 run_forward
 			-- Ensure the motor runs in the forward direction at
 			-- its current `speed'
 		do
-			print ("{MOTOR.run_forward:  ")
-			if pin_1 = pin_2 then
-				print ("same pins")
-			else
-				print ("two different pins")
-			end
-			print ("%N")
-			print ("{MOTOR.run_forward:  pin_1 = " + pin_1.state.out + "%N")
 			pin_1.set_state ({GPIO_PIN_CONSTANTS}.High)
-			print ("{MOTOR.run_forward:  pin_1 = " + pin_1.state.out + "%N")
-			print ("{MOTOR.run_forward:  pin_2 = " + pin_2.state.out + "%N")
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.Low)
-			print ("{MOTOR.run_forward:  pin_1 = " + pin_1.state.out + "%N")
-			print ("{MOTOR.run_forward:  pin_2 = " + pin_2.state.out + "%N")
 		ensure
 			not_reversed: not is_reversed
 			is_running: speed > 0 implies is_running
@@ -186,6 +181,8 @@ feature -- Basic operations
 		ensure
 			not_reversed: not is_reversed
 			is_running: speed > 0 implies is_running
+			pin_1_state: pin_1.state = {GPIO_PIN_CONSTANTS}.Low
+			pin_2_state: pin_2.state = {GPIO_PIN_CONSTANTS}.High
 		end
 
 	stop

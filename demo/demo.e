@@ -19,17 +19,18 @@ feature {NONE} -- Initialization
 			-- Run application.
 		do
 			clear_screen
-			pi.show_revision_information
-			run_gpio_tests
---			chap_1_led (5)
+--			pi.pin_17.set_state (0)
+--			pi.show_revision_information
+			chap_1_led (10)
+--			run_register_tests
+--			run_gpio_tests
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
 			if not pi.is_degraded_mode then
 --				chap_4_pwm_led (1)
-				pwm_motor_run (1)
+				pwm_motor_run (4)
 			end
 				-- Run test routines
-			test_register
 			print ("End program %N")
 		end
 
@@ -54,6 +55,15 @@ feature -- Basic operations
 			end
 		end
 
+	run_register_tests
+			-- Run tests on {REGISTER}
+		local
+			t: REGISTER_TESTS
+		do
+			create t
+			t.run_all
+		end
+
 	run_gpio_tests
 			-- Run test of the {GPIO} features
 		local
@@ -65,28 +75,20 @@ feature -- Basic operations
 			t.test_signal_features
 		end
 
-	test_register
-			-- Test the {REGISTER} class
-		local
-			t: REGISTER_TESTS
-		do
-			create t
-			t.run_all
-		end
-
-	chap_1_led (a_count: INTEGER)
+ 	chap_1_led (a_count: INTEGER)
 			-- Blink the led `a_count' times
 		local
 			i: INTEGER_32
 			led: LED
 		do
 			print ("Blink an LED %N")
-			create led.connect (pi.pin_17)
+			create led.connect (pi.pin_18)
 			from i := 1
 			until i > a_count
 			loop
 				led.turn_on
 				print ("LED should be ON %N")
+				sleep
 				sleep
 				led.turn_off
 				print ("LED should be OFF %N")
@@ -185,8 +187,8 @@ feature -- Basic operations
 			pi.pwm.enable_channel (0, 1)
 			pi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 			pi.pin_18.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
-			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
-			pi.pwm.show (0, 1)
+--			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+--			pi.pwm.show (0, 1)
 				-- Do it `a_count' times
 			from i := 1
 			until i > a_count
@@ -230,43 +232,41 @@ feature -- Basic operations
 		do
 			print ("%N")
 			print ("DEMO.pwm_motor_run %N")
-			enab := pi.pin_12
-			in_1 := pi.pin_5
-			in_2 := pi.pin_6
+			enab := pi.pin_18
+			in_1 := pi.pin_12
+			in_2 := pi.pin_16
 --			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
---			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
---			pi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
+				-- Set up
+			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			pi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
 			pi.pwm.enable_channel (0, 1)
 			pi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
-			enab.set_mode ({GPIO_PIN_CONSTANTS}.alt0)
+			enab.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
 			in_1.set_mode ({GPIO_PIN_CONSTANTS}.output)
 			in_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
 			create mot.connect (enab, in_1, in_2)
 --			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 --			pi.pwm.show (0, 1)
-				-- Set up
-
 				-- Do it `a_count' times
-			mot.run_forward
-			mot.set_speed (40)
-			mot.show
-			sleep
-			sleep
 			from i := 1
 			until i > a_count
 			loop
+				if mot.is_reversed then
+					mot.run_forward
+				else
+					mot.run_backward
+				end
 				n := 100
 				from v := 0
 				until v > n
 				loop
 					mot.set_speed (v)
-					print ("moter speed = " + mot.speed.out + "%N")
+--					print ("moter speed = " + mot.speed.out + "%N")
 --					pi.pwm.show (0, 1)
+					mot.show
 					v := v + 5
 					sleep
-					if v = 50 then
-						mot.show
-					end
+					sleep
 				end
 				i := i + 1
 			end
@@ -275,6 +275,7 @@ feature -- Basic operations
 			pi.pwm.disable_channel (0, 1)
 			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 			print ("%N")
+			enab.set_mode ({GPIO_PIN_CONSTANTS}.output)
 		end
 
 feature {NONE} -- Implementation
@@ -282,7 +283,7 @@ feature {NONE} -- Implementation
 	Sleep
 			-- Pause execution
 		do
-			{EXECUTION_ENVIRONMENT}.sleep ({INTEGER_64} 200_000_000)
+			{EXECUTION_ENVIRONMENT}.sleep ({INTEGER_64} 300_000_000)
 		end
 
 end

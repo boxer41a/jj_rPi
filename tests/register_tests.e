@@ -1,4 +1,4 @@
-note
+  note
 	description: "[
 		FIX ME!
 		Incomplete class intention is to test all register functions
@@ -48,29 +48,43 @@ feature -- Basic operations
 
 	run_all
 			-- Demo/test all features
+		local
+			test: PI_CONTROLLER
 		do
-
+				-- Force call to once feature
+			test := pi
+			test_access_features
+--			test_element_change_features
 		end
 
 
-	test
+	test_access_features
 			-- Pick a register from the `pi' and run test on it
-		local
-			r: REGISTER
 		do
+			divider ("test_access_features")
+			function (agent register.name, "name", "GPREN0")
+			function (agent register.as_hex_string, "as_hex_string", "0x00000000")
+			function (agent register.as_binary_string, "as_binary_string", "0b00000000000000000000000000000000")
+			function (agent register.default_value, "default_value", 0)
+		end
+
+	test_element_change_features
+			-- Test the element change operations
+		do
+			divider ("test_element_change_features")
+			procedure (agent register.reset, "reset")
+			function (agent register.as_hex_string, "as_hex_string", "0x00000000")
+			procedure (agent register.set_value (0x12345678), "set_value")
+			function (agent register.as_hex_string, "as_hex_string", "0x12345678")
 		end
 
 feature -- Implementation
 
-	register_anchor: detachable TESTABLE_REGISTER
-			-- Anchor for type of objects to test
-		require
-			never_called: false
-		do
-			check
-				do_not_call: false then
-					-- Because gives no info; simply used as anchor.
-			end
+	register: REGISTER
+			-- A simple read-write register with no reserved bits, etc.
+			-- Pick one from the {GPIO}
+		once
+			Result := pi.gpio.gpren_0
 		end
 
 end
