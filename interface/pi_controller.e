@@ -10,7 +10,7 @@ deferred class
 
 inherit
 
-	SHARED
+	PI_SHARED
 		redefine
 			default_create
 		end

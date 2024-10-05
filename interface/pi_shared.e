@@ -6,7 +6,7 @@ note
 	date: "11/14/20"
 
 class
-	SHARED
+	PI_SHARED
 
 inherit {NONE}
 

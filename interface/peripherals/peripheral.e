@@ -13,7 +13,7 @@ inherit
 
 	ANY
 
-	SHARED
+	PI_SHARED
 		export
 			{NONE}
 				all

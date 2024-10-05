@@ -80,6 +80,7 @@ feature -- Basic operations
 		do
 			print ("Blink an LED %N")
 			pi.pin_18.set_mode ({GPIO_PIN_CONSTANTS}.Output)
+			sleep
 			create led.connect (pi.pin_18)
 			from i := 1
 			until i > a_count
