@@ -151,6 +151,18 @@ feature -- Element change
 
 feature -- Query
 
+	is_low: BOOLEAN
+			-- Is the `state' of this pin Low?
+		do
+			Result := state = {GPIO_PIN_CONSTANTS}.Low
+		end
+		
+	is_high: BOOLEAN
+			-- Is the `state' of this pin High?
+		do
+			Result := state = {GPIO_PIN_CONSTANTS}.High
+		end
+
 	has_function (a_function: like function): BOOLEAN
 			-- Does Current support `a_function'?
 		do

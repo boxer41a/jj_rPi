@@ -55,6 +55,7 @@ feature {NONE} -- Implementation
 			pin_2 := a_pin_2
 			pwm := pwm_pin.pi.pwm
 			pwm.set_range (pwm_index, pwm_channel, 100)
+			set_speed (0)
 		end
 
 feature -- Access
