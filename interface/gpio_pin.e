@@ -156,7 +156,7 @@ feature -- Query
 		do
 			Result := state = {GPIO_PIN_CONSTANTS}.Low
 		end
-		
+
 	is_high: BOOLEAN
 			-- Is the `state' of this pin High?
 		do

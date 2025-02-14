@@ -36,15 +36,42 @@ note
 class
 	MOTOR
 
+inherit
+
+	PI_SHARED
+		redefine
+			default_create
+		end
+
 create
+	default_create,
 	connect
 
 feature {NONE} -- Implementation
 
+	default_create
+			-- Create an instance
+			-- Feature `connect' or `set' must be called to make
+			-- Current usable
+		do
+			pwm := pi.pwm
+			pwm_pin := pi.pin_18
+			pin_1 := pi.pin_21
+			pin_2 := pi.pin_10
+			pwm_pin.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
+			pin_1.set_mode ({GPIO_PIN_CONSTANTS}.output)
+			pin_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
+		ensure then
+			default_pwm_pin: pwm_pin = pi.pin_18
+			default_pin_1: pin_1 = pi.pin_9
+			default_pin_2: pin_2 = pi.pin_10
+			is_set: is_connected
+		end
+
 	connect (a_pwm_pin, a_pin_1, a_pin_2: GPIO_PIN)
 			-- Create an instance where the value on `a_pwm_pin'
 			-- controls the `speed' and the values on `a_pin_1'
-			-- and `a_pin_2' controls the direction
+			-- and `a_pin_2' control the direction
 		require
 			is_pwm_pin: a_pwm_pin.is_set_for_pwm
 			pin_1_is_output: a_pin_1.mode = {GPIO_PIN_CONSTANTS}.output
@@ -56,6 +83,8 @@ feature {NONE} -- Implementation
 			pwm := pwm_pin.pi.pwm
 			pwm.set_range (pwm_index, pwm_channel, 100)
 			set_speed (0)
+		ensure
+			is_connected: is_connected
 		end
 
 feature -- Access
@@ -132,12 +161,20 @@ feature -- Element change
 
 feature -- Status report
 
+	is_connected: BOOLEAN
+			-- Are the pins connected to Current set correctly?
+		do
+			Result := pin_1.mode = {GPIO_PIN_CONSTANTS}.Output and
+					pin_2.mode = {GPIO_PIN_CONSTANTS}.Output and
+					pwm_pin.is_set_for_pwm
+		end
+
 	is_running: BOOLEAN
 			-- Should the motor be running?
 			-- True if the state of `input_pin_1' and `input_pin_2' are
 			-- both High or both Low.
 		do
-			Result := not is_stopped
+			Result := is_connected and then not is_stopped
 		ensure
  			definition: Result implies not is_stopped
 		end
@@ -163,14 +200,16 @@ feature -- Basic operations
 	 run_forward
 			-- Ensure the motor runs in the forward direction at
 			-- its current `speed'
+		require
+
 		do
-			pin_1.set_state ({GPIO_PIN_CONSTANTS}.High)
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.Low)
+			pin_1.set_state ({GPIO_PIN_CONSTANTS}.High)
 		ensure
 			not_reversed: not is_reversed
 			is_running: speed > 0 implies is_running
-			pin_1_state: pin_1.state = {GPIO_PIN_CONSTANTS}.High
-			pin_2_state: pin_2.state = {GPIO_PIN_CONSTANTS}.Low
+			pin_1_state: pin_1.is_high
+			pin_2_state: pin_2.is_low
 		end
 
 	run_backward
@@ -180,10 +219,10 @@ feature -- Basic operations
 			pin_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.High)
 		ensure
-			not_reversed: is_reversed
+			is_reversed: is_reversed
 			is_running: speed > 0 implies is_running
-			pin_1_state: pin_1.state = {GPIO_PIN_CONSTANTS}.Low
-			pin_2_state: pin_2.state = {GPIO_PIN_CONSTANTS}.High
+			pin_1_state: pin_1.is_low
+			pin_2_state: pin_2.is_high
 		end
 
 	stop
@@ -219,9 +258,14 @@ feature {NONE} -- Implementation
 
 invariant
 
-	is_pwm_pin: pwm_pin.is_set_for_pwm
-	pin_1_is_output_mode: pin_1.mode = {GPIO_PIN_CONSTANTS}.Output
-	pin_2_is_output_mode: pin_2.mode = {GPIO_PIN_CONSTANTS }.Output
+	different_pins: pin_1 /= pin_2 and pin_1 /= pwm_pin and pin_2 /= pwm_pin
 
+	is_pwm_capable: pwm_pin.has_pwm_function
+
+	connected_pwm_implication: is_connected implies pwm_pin.is_set_for_pwm
+	connected_pin_1_implication: is_connected implies pin_1.mode = {GPIO_PIN_CONSTANTS}.Output
+	connected_pin_2_implication: is_connected implies pin_2.mode = {GPIO_PIN_CONSTANTS}.Output
+
+	not_both_high: not (pin_1.is_high and pin_2.is_high)
 
 end
