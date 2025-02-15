@@ -28,7 +28,7 @@ inherit
 			default_create
 		end
 
-	SHARED
+	PI_SHARED
 		undefine
 			default_create
 		end

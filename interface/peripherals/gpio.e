@@ -270,9 +270,9 @@ feature -- Basic operations
 		do
 			reg := function_select_register (a_number)
 			m := reg.pin_mode (a_number)
-			if m /= a_mode then
-				terminate_mode (a_number)
-			end
+--			if m /= a_mode then
+--				terminate_mode (a_number)
+--			end
 			reg.set_pin_mode (a_number, a_mode)
 		ensure
 			mode_was_set: mode_on_pin (a_number) = a_mode
@@ -556,14 +556,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gpset_0
 			else
 				Result := gpset_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gpset_0
-			upper_pins_implication: a_number > 32 implies Result = gpset_1
+			lower_pins_implication: a_number < 32 implies Result = gpset_0
+			upper_pins_implication: a_number >= 32 implies Result = gpset_1
 		end
 
 	gpclr_register (a_number: INTEGER_32): REGISTER
@@ -572,14 +572,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gpclr_0
 			else
 				Result := gpclr_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gpclr_0
-			upper_pins_implication: a_number > 32 implies Result = gpclr_1
+			lower_pins_implication: a_number < 32 implies Result = gpclr_0
+			upper_pins_implication: a_number >= 32 implies Result = gpclr_1
 		end
 
 	gplev_register (a_number: INTEGER_32): REGISTER
@@ -588,14 +588,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gplev_0
 			else
 				Result := gplev_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gplev_0
-			upper_pins_implication: a_number > 32 implies Result = gplev_1
+			lower_pins_implication: a_number < 32 implies Result = gplev_0
+			upper_pins_implication: a_number >= 32 implies Result = gplev_1
 		end
 
 	gpeds_register (a_number: INTEGER_32): REGISTER
@@ -604,14 +604,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gpeds_0
 			else
 				Result := gpeds_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gpeds_0
-			upper_pins_implication: a_number > 32 implies Result = gpeds_1
+			lower_pins_implication: a_number < 32 implies Result = gpeds_0
+			upper_pins_implication: a_number >= 32 implies Result = gpeds_1
 		end
 
 	gpren_register (a_number: INTEGER_32): REGISTER
@@ -620,14 +620,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gpren_0
 			else
 				Result := gpren_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gpren_0
-			upper_pins_implication: a_number > 32 implies Result = gpren_1
+			lower_pins_implication: a_number < 32 implies Result = gpren_0
+			upper_pins_implication: a_number >= 32 implies Result = gpren_1
 		end
 
 	gpfen_register (a_number: INTEGER_32): REGISTER
@@ -636,14 +636,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gpfen_0
 			else
 				Result := gpfen_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gpfen_0
-			upper_pins_implication: a_number > 32 implies Result = gpfen_1
+			lower_pins_implication: a_number < 32 implies Result = gpfen_0
+			upper_pins_implication: a_number >= 32 implies Result = gpfen_1
 		end
 
 	gphen_register (a_number: INTEGER_32): REGISTER
@@ -652,14 +652,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gphen_0
 			else
 				Result := gphen_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gphen_0
-			upper_pins_implication: a_number > 32 implies Result = gphen_1
+			lower_pins_implication: a_number < 32 implies Result = gphen_0
+			upper_pins_implication: a_number >= 32 implies Result = gphen_1
 		end
 
 	gplen_register (a_number: INTEGER_32): REGISTER
@@ -668,14 +668,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gplen_0
 			else
 				Result := gplen_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gplen_0
-			upper_pins_implication: a_number > 32 implies Result = gplen_1
+			lower_pins_implication: a_number < 32 implies Result = gplen_0
+			upper_pins_implication: a_number >= 32 implies Result = gplen_1
 		end
 
 	gparen_register (a_number: INTEGER_32): REGISTER
@@ -684,14 +684,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gparen_0
 			else
 				Result := gparen_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gparen_0
-			upper_pins_implication: a_number > 32 implies Result = gparen_1
+			lower_pins_implication: a_number < 32 implies Result = gparen_0
+			upper_pins_implication: a_number >= 32 implies Result = gparen_1
 		end
 
 	gpafen_register (a_number: INTEGER_32): REGISTER
@@ -700,14 +700,14 @@ feature {NONE} -- Implementation
 		require
 			is_valid_pin_number: is_valid_pin_number (a_number)
 		do
-			if a_number <= 32 then
+			if a_number < 32 then
 				Result := gpafen_0
 			else
 				Result := gpafen_1
 			end
 		ensure
-			lower_pins_implication: a_number <= 32 implies Result = gpafen_0
-			upper_pins_implication: a_number > 32 implies Result = gpafen_1
+			lower_pins_implication: a_number < 32 implies Result = gpafen_0
+			upper_pins_implication: a_number >= 32 implies Result = gpafen_1
 		end
 
 	pull_up_down_register (a_number: INTEGER_32): PULL_UP_DOWN_REGISTER
@@ -727,7 +727,7 @@ feature {NONE} -- Implementation
 			when 1 then
 				Result := gpio_pup_pdn_cntrl_reg1
 			when 2 then
-				Result := gpio_pup_pdn_cntrl_reg3
+				Result := gpio_pup_pdn_cntrl_reg2
 			when 3 then
 				Result := gpio_pup_pdn_cntrl_reg3
 			else

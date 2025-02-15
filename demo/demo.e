@@ -8,7 +8,7 @@ class
 
 inherit
 
-	SHARED
+	PI_SHARED
 
 create
 	make
@@ -20,6 +20,7 @@ feature {NONE} -- Initialization
 		do
 			clear_screen
 			pi.show_revision_information
+			run_gpio_tests
 			chap_1_led (10)
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
@@ -79,9 +80,9 @@ feature -- Basic operations
 			led: LED
 		do
 			print ("Blink an LED %N")
-			pi.pin_18.set_mode ({GPIO_PIN_CONSTANTS}.Output)
+			pi.pin_17.set_mode ({GPIO_PIN_CONSTANTS}.Output)
 			sleep
-			create led.connect (pi.pin_18)
+			create led.connect (pi.pin_17)
 			from i := 1
 			until i > a_count
 			loop
