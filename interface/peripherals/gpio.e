@@ -288,6 +288,7 @@ feature -- Basic operations
 			valid_signal: a_signal = {GPIO_PIN_CONSTANTS}.Low or a_signal = {GPIO_PIN_CONSTANTS}.High
 		local
 			reg: REGISTER
+			n: NATURAL_32
 		do
 			if a_signal = {GPIO_PIN_CONSTANTS}.Low then
 					-- Get the GPCLRx register associated with `a_number'
@@ -296,7 +297,15 @@ feature -- Basic operations
 					-- Get the GPSETx register associated with `a_number'
 				reg := gpset_register (a_number)
 			end
+			if a_number = 10 then
+				do_nothing
+			end
 			reg.set_bit (a_number \\ 32)
+			if a_number = 10 then
+				n := read_signal_on_pin (a_number)
+			end
+		ensure
+			signal_was_written: read_signal_on_pin (a_number) = a_signal
 		end
 
 	read_signal_on_pin (a_number: INTEGER_32): NATURAL_32

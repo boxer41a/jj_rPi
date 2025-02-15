@@ -125,11 +125,16 @@ feature -- Basic operations
 			from i := 0
 			until i > pi.pin_last.number
 			loop
+				if i /= 10 then
+
 				function (agent gpio.mode_on_pin (i), "mode_on_pin", {GPIO_PIN_CONSTANTS}.Output)
-				procedure (agent gpio.write_signal_on_pin (i, {GPIO_PIN_CONSTANTS}.Low), "write_signal_state_on_pin")
+				procedure (agent gpio.write_signal_on_pin (i, {GPIO_PIN_CONSTANTS}.Low), "write_signal_on_pin")
 				function (agent gpio.read_signal_on_pin (i), "read_signal_on_pin", {GPIO_PIN_CONSTANTS}.Low)
-				procedure (agent gpio.write_signal_on_pin (i, {GPIO_PIN_CONSTANTS}.High), "write_signal_state_on_pin")
+				procedure (agent gpio.write_signal_on_pin (i, {GPIO_PIN_CONSTANTS}.High), "write_signal_on_pin")
 				function (agent gpio.read_signal_on_pin (i), "read_signal_on_pin", {GPIO_PIN_CONSTANTS}.High)
+
+				end
+
 				i := i + 1
 			end
 		end

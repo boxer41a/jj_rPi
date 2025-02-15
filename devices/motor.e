@@ -57,14 +57,14 @@ feature {NONE} -- Implementation
 			pwm := pi.pwm
 			pwm_pin := pi.pin_18
 			pin_1 := pi.pin_21
-			pin_2 := pi.pin_10
+			pin_2 := pi.pin_17
 			pwm_pin.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
 			pin_1.set_mode ({GPIO_PIN_CONSTANTS}.output)
 			pin_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
 		ensure then
 			default_pwm_pin: pwm_pin = pi.pin_18
 			default_pin_1: pin_1 = pi.pin_21
-			default_pin_2: pin_2 = pi.pin_10
+			default_pin_2: pin_2 = pi.pin_17
 			is_set: is_connected
 		end
 
@@ -182,9 +182,10 @@ feature -- Status report
 	is_stopped: BOOLEAN
 			-- Should the motor be stopped?
 		do
-			Result := pin_1.state = pin_2.state
+			Result := (pin_1.state = {GPIO_PIN_CONSTANTS}.Low and pin_2.state = {GPIO_PIN_CONSTANTS}.Low)
 		ensure
-			definition: Result implies pin_1.state = pin_2.state
+			pin_1_definition: Result implies pin_1.state = {GPIO_PIN_CONSTANTS}.Low
+			pin_2_definition: Result implies pin_2.state = {GPIO_PIN_CONSTANTS}.Low
 		end
 
 	is_reversed: BOOLEAN
@@ -216,8 +217,8 @@ feature -- Basic operations
 			-- Ensure the motor runs in the backward direction at
 			-- its current speed
 		do
-			pin_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.High)
+			pin_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
 		ensure
 			is_reversed: is_reversed
 			is_running: speed > 0 implies is_running
@@ -232,6 +233,7 @@ feature -- Basic operations
 			show
 			pin_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.Low)
+			set_speed (0)
 		ensure
 			is_stopped: is_stopped
 		end

@@ -20,7 +20,7 @@ feature {NONE} -- Initialization
 		do
 			clear_screen
 			pi.show_revision_information
-			run_gpio_tests
+--			run_gpio_tests
 			chap_1_led (10)
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
@@ -95,6 +95,7 @@ feature -- Basic operations
 				sleep
 				i := i + 1
 			end
+			led.turn_off
 		end
 
 	chap_2_button_and_led (a_count: INTEGER_32)
@@ -239,15 +240,18 @@ feature -- Basic operations
 			pi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 				-- For convenience, assign pins to local variables
 			enab := pi.pin_18
-			in_1 := pi.pin_12
-			in_2 := pi.pin_16
+			in_1 := pi.pin_21
+			in_2 := pi.pin_17
 				-- Set the enable pin to alt5 mode, which is PWM,
 				-- and the two control pins to output mode.
 			enab.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
 			in_1.set_mode ({GPIO_PIN_CONSTANTS}.output)
 			in_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
+			in_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
+			in_2.set_state ({GPIO_PIN_CONSTANTS}.Low)
 				-- Create the {MOTOR} object
 			create mot.connect (enab, in_1, in_2)
+			mot.stop
 				-- Do it `a_count' times
 			from i := 1
 			until i > a_count
@@ -274,6 +278,7 @@ feature -- Basic operations
 			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 			print ("%N")
 			enab.set_mode ({GPIO_PIN_CONSTANTS}.output)
+			enab.set_state ({GPIO_PIN_CONSTANTS}.Low)
 		end
 
 feature {NONE} -- Implementation
