@@ -16,8 +16,8 @@ note
 		7 * Input 2     Input 3 * 10
 		8 * Vs         Enable 2 * 9
 		  ***********************
-		
-		
+
+
 		 Wire this controller to the Raspberry Pi as follows:
 		    VSS (pin 16) to rPi 3.3V
 		    Enable 1 (pin 1) to an rPi PWM-enabled pin
@@ -63,7 +63,7 @@ feature {NONE} -- Implementation
 			pin_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
 		ensure then
 			default_pwm_pin: pwm_pin = pi.pin_18
-			default_pin_1: pin_1 = pi.pin_9
+			default_pin_1: pin_1 = pi.pin_21
 			default_pin_2: pin_2 = pi.pin_10
 			is_set: is_connected
 		end
@@ -228,6 +228,8 @@ feature -- Basic operations
 	stop
 			-- Stop the motor; don't change the speed or direction
 		do
+			print ("MOTOR.stop %N")
+			show
 			pin_1.set_state ({GPIO_PIN_CONSTANTS}.Low)
 			pin_2.set_state ({GPIO_PIN_CONSTANTS}.Low)
 		ensure
@@ -238,8 +240,8 @@ feature -- Basic operations
 			-- Display info about Current
 		do
 			print ("{MOTOR}.show:%N")
-			print ("%T pin_1:  " + pin_1.name + " = " + pin_1.state.out + "%N")
-			print ("%T pin_2:  " + pin_2.name + " = " + pin_2.state.out  + "%N")
+			print ("%T pin_1:  " + pin_1.name + ", mode = " + pin_1.mode.out + ", state = " + pin_1.state.out + "%N")
+			print ("%T pin_2:  " + pin_2.name + ", mode = " + pin_2.mode.out + ", state = " + pin_2.state.out + "%N")
 			print ("%T pwm_channel:  " + pwm_channel.out + "%N")
 			print ("%T pwm_index:  " + pwm_index.out + "%N")
 			print ("%T speed:  " + speed.out + "%N")
@@ -262,9 +264,9 @@ invariant
 
 	is_pwm_capable: pwm_pin.has_pwm_function
 
-	connected_pwm_implication: is_connected implies pwm_pin.is_set_for_pwm
-	connected_pin_1_implication: is_connected implies pin_1.mode = {GPIO_PIN_CONSTANTS}.Output
-	connected_pin_2_implication: is_connected implies pin_2.mode = {GPIO_PIN_CONSTANTS}.Output
+	connected_pwm_implication: pwm_pin.is_set_for_pwm
+	connected_pin_1_implication: pin_1.mode = {GPIO_PIN_CONSTANTS}.Output
+	connected_pin_2_implication: pin_2.mode = {GPIO_PIN_CONSTANTS}.Output
 
 	not_both_high: not (pin_1.is_high and pin_2.is_high)
 

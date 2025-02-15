@@ -143,8 +143,19 @@ feature -- Element change
 		require
 			is_output_mode: mode = {GPIO_PIN_CONSTANTS}.output
 			valid_signal: a_signal = {GPIO_PIN_CONSTANTS}.Low or a_signal = {GPIO_PIN_CONSTANTS}.High
+		local
+			i: INTEGER
 		do
 			pi.gpio.write_signal_on_pin (number, a_signal)
+				-- Give time for state to take
+			from i := 1
+			until state = a_signal or else i > 1000
+			loop
+				i := i + 1
+			end
+			if i > 1000 then
+				print ("GPIO_PIN.set_state (" + a_signal.out + ") = " + state.out + "   error %N")
+			end
 		ensure
 			state_was_set: state = a_signal
 		end
