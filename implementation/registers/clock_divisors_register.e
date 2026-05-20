@@ -130,6 +130,7 @@ invariant
 	is_bit_26_write_only: is_bit_write_only (26)
 	is_bit_25_write_only: is_bit_write_only (25)
 	is_bit_24_write_only: is_bit_write_only (24)
+		-- Value bits
 	is_bit_23_read_writable: is_bit_read_writable (23)
 	is_bit_22_read_writable: is_bit_read_writable (22)
 	is_bit_21_read_writable: is_bit_read_writable (21)

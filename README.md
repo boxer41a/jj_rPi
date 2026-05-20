@@ -194,5 +194,5 @@ feature {NONE} -- Implementation
 			-- Offsett from `peripheral_ase_address' to the PWM registers.
 			-- BCM2711 ARM Peripherals, page
 ```
-Again, these values are from the [Broadcom BCM2835 ARM Peripherals](./docs/BCM2835 ARM Peripherals.pdf) document.
+Again, these values are from the [Broadcom BCM2835 ARM Peripherals](<./docs/BCM2835 ARM Peripherals.pdf>) document.
 
