@@ -95,7 +95,7 @@ This call feature *write_signal_on_pin* from class [GPIO](./interface/peripheral
 			reg.set_bit (a_number \\ 32)
 		end
 ```
-The feature simply sets a pin's output to either high or low.  It accomplishes this by writing a one to the appropriate bit of a particular register.  To make a pin output High the feature writes a one to one of the two GPCLRn (GPIO Pin Output Set Registers); to clear a pin (i.e. make it go low or to zero volts) the feature writes a ONE to one of the two GPCLRn (GPIO Pin Output Clear Registers).  Information about these registers are in [Broadcom BCM2835 ARM Peripherals](./docs/BCM2835 ARM Peripherals.pdf).
+The feature simply sets a pin's output to either high or low.  It accomplishes this by writing a one to the appropriate bit of a particular register.  To make a pin output High the feature writes a one to one of the two GPCLRn (GPIO Pin Output Set Registers); to clear a pin (i.e. make it go low or to zero volts) the feature writes a ONE to one of the two GPCLRn (GPIO Pin Output Clear Registers).  Information about these registers are in [Broadcom BCM2835 ARM Peripherals](<./docs/BCM2835 ARM Peripherals.pdf>).
 
 ## Example (low-level)
 The last line of the code above *reg.set_bit (a_number \\ 32)* brings the example down to the low-level implementation details.  Feature *reg* is of type [REGISTER](./implementation/registers), a class that uses in-line C code to write directly to memeory locations.  Here is feature *set_bit*, which changes a single bit in a 32 bit memory location while leaving the other bits unchanged.
