@@ -168,7 +168,7 @@ The value of *pointer*, a feature of class [REGISTER](./implementation/registers
 			create gpclr_0.make (base_address + 0x28, "GPCLR0")
 			create gpclr_1.make (base_address + 0x2C, "GPCLR1")
 ```
-The offsets are giveing in [Broadcom BCM2835 ARM Peripherals](./docs/BCM2835 ARM Peripherals.pdf) and the base address is calculated by a call
+The offsets are giveing in [Broadcom BCM2835 ARM Peripherals](<./docs/BCM2835 ARM Peripherals.pdf>) and the base address is calculated by a call
 >*base\_address := c\_mmap (a\_file\_descriptor, a\_length, a\_address)*
 
 from class [PERIPHERAL](./interface/peripherals/peripheral.e).  The addresses ultimately come from feature *create\_interface\_objects* of class [PI_CONTROLLER](./interface/pi_controller.e) which attempts to open file "dev/mem" or file "/dev/gpiomen" and constants from class [PI\_4\_CONTROLLER](./interface/pi_4_controller.e).
