@@ -16,15 +16,14 @@ library_target="jj_rpi">
 		<option warning="warning" manifest_array_type="mismatch_warning">
 			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
 		</option>
-		<setting name="console_application" value="true"/>
-		<setting name="total_order_on_reals" value="false"/>
 		<setting name="dead_code_removal" value="feature"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
 		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf"/>
-		<cluster name="devices" location=".\devices\" recursive="true"/>
-		<cluster name="implementation" location=".\implementation\" recursive="true"/>
-		<cluster name="interface" location=".\interface\" recursive="true"/>
+		<cluster name="devices" location=".\classes\devices\" recursive="true"/>
+		<cluster name="implementation" location=".\classes\implementation\" recursive="true"/>
+		<cluster name="interface" location=".\classes\interface\" recursive="true"/>
 	</target>
+
 	<target name="jj_rpi_tests" extends="jj_rpi">
 		<root class="APPLICATION" feature="make"/>
 		<option warning="warning">
@@ -34,4 +33,5 @@ library_target="jj_rpi">
 		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
 		<cluster name="test" location=".\testing\" recursive="true"/>
 	</target>
+
 </system>

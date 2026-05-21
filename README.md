@@ -11,11 +11,13 @@ The library is divided into three parts:  1) the [interface](./interface), the [
 
 ## The Big Picture
 
-<img src="./docs/Diagram.png" alt="drawing" width="100%"/>
+<img src="./docs/Interface.png" alt="drawing" width="100%"/>
+
+## Overview
+
+The system [rpi_demo.ecf](./demo/rpi_demo.ecf) uses [DEMO](./demo/demo.e) to show how to use some of the library's classes and features.  The top abstraction is class [RPI](./interface/rpi.e) containing a reference to an {RPI_PROCESSOR} whose type is determined based on the hardware on which the system is running.  (At this time, the library supports only a [BCM2711_PROCESSOR](./interface/pi_4_controller.e) but other controllers could be added.)  Class [RPI](./interface/rpi.e) gives access through its process to the Pi's [GPIO](./interface/peripherals/gpio.e), [CLOCKS](./interface/peripherals/clocks.e), and [PWM](./interface/peripherals/pwm.e) peripherals and to each [GPIO_PIN](./interface/gpio_pin.e).
 
 ## Example (high-level)
-
-The system [rpi_demo.ecf](./demo/rpi_demo.ecf) uses [DEMO](./demo/demo.e) to show how to use some of the library's classes and features.  First notice that class [DEMO](./demo/demo.e) inherits from class [SHARED](./interface/shared.e), which provides access through feature *pi* to the one and only one [PI_CONTROLLER](./interface/pi_controller.e) in a system.  (At this time, the library supports only a [PI\_4\_CONTROLLER](./interface/pi_4_controller.e) but other controllers could be added.)  Class [PI_CONTROLLER](./interface/pi_controller.e) gives access to the Pi's [GPIO](./interface/peripherals/gpio.e), [CLOCKS](./interface/peripherals/clocks.e), and [PWM](./interface/peripherals/pwm.e) peripherals and to each [GPIO_PIN](./interface/gpio_pin.e).
 
 Feature *chap\_1\_led* from class [DEMO](./demo/demo.e) illustrates some high-level features of the libary and gives a starting point to drill down into low-level implementation details.
 
@@ -27,8 +29,8 @@ Feature *chap\_1\_led* from class [DEMO](./demo/demo.e) illustrates some high-le
 			led: LED
 		do
 			print ("Blink an LED %N")
-			pi.pin_18.set_mode ({GPIO_PIN_CONSTANTS}.Output)
-			create led.connect (pi.pin_18)
+			rpi.pin (17).set_mode ({GPIO_PIN_CONSTANTS}.Output)
+			create led.connect (pi.pin (17))
 			from i := 1
 			until i > a_count
 			loop
@@ -95,10 +97,10 @@ This call feature *write_signal_on_pin* from class [GPIO](./interface/peripheral
 			reg.set_bit (a_number \\ 32)
 		end
 ```
-The feature simply sets a pin's output to either high or low.  It accomplishes this by writing a one to the appropriate bit of a particular register.  To make a pin output High the feature writes a one to one of the two GPCLRn (GPIO Pin Output Set Registers); to clear a pin (i.e. make it go low or to zero volts) the feature writes a ONE to one of the two GPCLRn (GPIO Pin Output Clear Registers).  Information about these registers are in [Broadcom BCM2835 ARM Peripherals](<./docs/BCM2835 ARM Peripherals.pdf>).
+The feature simply sets a pin's output to either high or low.  It accomplishes this by writing a one to the appropriate bit of a particular register.  To make a pin output High the feature writes a one to one of the two GPCLRn (GPIO Pin Output Set Registers); to clear a pin (i.e. make it go low or to zero volts) the feature writes a ONE to one of the two GPCLRn (GPIO Pin Output Clear Registers).  Information about these registers are in [Broadcom BCM2835 ARM Peripherals](<./docs/BCM2835 ARM Peripherals.pdf>).  The last line of the code above *reg.set_bit (a_number \\ 32)* brings the example down to the low-level implementation details.  
 
 ## Example (low-level)
-The last line of the code above *reg.set_bit (a_number \\ 32)* brings the example down to the low-level implementation details.  Feature *reg* is of type [REGISTER](./implementation/registers), a class that uses in-line C code to write directly to memeory locations.  Here is feature *set_bit*, which changes a single bit in a 32 bit memory location while leaving the other bits unchanged.
+Feature *reg* is of type [REGISTER](./implementation/registers), a class that uses in-line C code to write directly to memeory locations.  Here is feature *set_bit*, which changes a single bit in a 32 bit memory location while leaving the other bits unchanged.
 
 ```
 	set_bit (a_index: INTEGER_32)
@@ -171,8 +173,7 @@ The value of *pointer*, a feature of class [REGISTER](./implementation/registers
 The offsets are giveing in [Broadcom BCM2835 ARM Peripherals](<./docs/BCM2835 ARM Peripherals.pdf>) and the base address is calculated by a call
 >*base\_address := c\_mmap (a\_file\_descriptor, a\_length, a\_address)*
 
-from class [PERIPHERAL](./interface/peripherals/peripheral.e).  The addresses ultimately come from feature *create\_interface\_objects* of class [PI_CONTROLLER](./interface/pi_controller.e) which attempts to open file "dev/mem" or file "/dev/gpiomen" and constants from class [PI\_4\_CONTROLLER](./interface/pi_4_controller.e).
-
+from class [PERIPHERAL](./interface/peripherals/peripheral.e).  The addresses are calculated in feature *initialize_pariferals* of class [PI_CONTROLLER](./interface/pi_controller.e) using offset constants defined in descendents of class [PI_CONTROLLER](./interface/pi_controller.e). 
 ```
 feature {NONE} -- Implementation
 

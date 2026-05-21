@@ -13,12 +13,6 @@ inherit
 
 	ANY
 
-	PI_SHARED
-		export
-			{NONE}
-				all
-		end
-
 	MEMORY
 		export
 			{NONE}

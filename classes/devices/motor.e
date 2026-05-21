@@ -38,7 +38,7 @@ class
 
 inherit
 
-	PI_SHARED
+	ANY
 		redefine
 			default_create
 		end
@@ -53,18 +53,23 @@ feature {NONE} -- Implementation
 			-- Create an instance
 			-- Feature `connect' or `set' must be called to make
 			-- Current usable
+		local
+			rpi: RPI
 		do
-			pwm := pi.pwm
-			pwm_pin := pi.pin_18
-			pin_1 := pi.pin_21
-			pin_2 := pi.pin_17
+				-- Creae a temporary {RPI} to gain access to pins and PWM.
+				-- Remember, the {PI_CONTOLLER} is a once class.
+			create rpi
+			pwm := rpi.pwm
+			pwm_pin := rpi.pin (18)
+			pin_1 := rpi.pin (12)
+			pin_2 := rpi.pin (17)
 			pwm_pin.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
 			pin_1.set_mode ({GPIO_PIN_CONSTANTS}.output)
 			pin_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
 		ensure then
-			default_pwm_pin: pwm_pin = pi.pin_18
-			default_pin_1: pin_1 = pi.pin_21
-			default_pin_2: pin_2 = pi.pin_17
+			default_pwm_pin: pwm_pin.number = 18
+			default_pin_1: pin_1.number = 21
+			default_pin_2: pin_2.number = 17
 			is_set: is_connected
 		end
 

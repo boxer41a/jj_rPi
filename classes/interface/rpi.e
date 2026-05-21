@@ -1,38 +1,100 @@
 note
 	description: "[
-		Global infrmation at the one {PI_CONTROLLER} in the system.
+		Represents a Raspberry Pi.
 		]"
 	author: "Jimmy J Johnson"
-	date: "11/14/20"
+	date: "5/21/26        11/14/20"
 
 class
-	PI_SHARED
+	RPI
+
+inherit
+
+	ANY
+		redefine
+			default_create
+		end
 
 inherit {NONE}
 
-	PI_CONSTANTS
+	RPI_CONSTANTS
 		export
 			{NONE}
 				all
+		redefine
+			default_create
+		end
+
+create
+	default_create
+
+feature {NONE} -- Initialization
+
+	default_create
+			-- Create an instance
+		do
+				-- The {RPI_PROCESSOR} (e.g. {BCM2711_PROCESSOR})
+				-- should be effected as a once class where `default_create'
+				-- is redefined as a once ("PROCESS"), meaning only one
+				-- controller is created in a system.
+			inspect processor_number
+--			when {RPI_CONSTANTS}.Processor_bcm2835 then
+--			when {RPI_CONSTANTS}.Processor_bcm2836 then
+--			when {RPI_CONSTANTS}.Processor_bcm2837 then
+			when {RPI_CONSTANTS}.Processor_bcm2711 then
+				create {BCM2711_PROCESSOR} processor
+			else
+					-- Assume Pi-4 platform for testing?
+				create {BCM2711_PROCESSOR} processor
+			end
+
 		end
 
 feature -- Access
 
-	pi: PI_CONTROLLER
-			-- The one {PI_CONTROLLER} in the system
-		once
-			inspect processor
---			when {PI_CONSTANTS}.Processor_bcm2835 then
---			when {PI_CONSTANTS}.Processor_bcm2836 then
---			when {PI_CONSTANTS}.Processor_bcm2837 then
-			when {PI_CONSTANTS}.Processor_bcm2711 then
-				Result := create {PI_4_CONTROLLER}
-			else
-					-- Assume Pi-4 platform for testing?
-				Result := create {PI_4_CONTROLLER}
-			end
+	processor: RPI_PROCESSOR
+			-- The one {RPI_PROCESSOR} in the system, giving access to
+			-- GPIO pins and other periferals (e.g. PWM, clocks, etc.)
 
+	pin (a_index: INTEGER): GPIO_PIN
+			-- The pin at `a_index'.
+			-- GPIO pins are numbered started with 0.
+			-- Convenience feature accessing through the  `controller'
+		require
+			pin_number_big_enough: a_index >=0
+			pin_number_small_enough: a_index <= processor.pin_count - 1
+		do
+			Result := processor.pin (a_index)
+		ensure
+			correct_pin: Result.number = a_index
 		end
+
+	gpio: GPIO
+			-- {PERIPHERAL} giving access to the GPIO pins
+			-- Convenience feature accessing through the  `controller'
+		do
+			Result := processor.gpio
+		end
+
+	clocks: CLOCKS
+			-- {PERIPHERAL} giving access to the clocks
+			-- Convenience feature accessing through the  `controller'
+		require
+			not_is_degraded_mode: not processor.is_degraded_mode
+		do
+			Result := processor.clocks
+		end
+
+	pwm: PWM
+			-- {PERIPHERAL} giving access to the PWM controllers
+			-- Convenience feature accessing through the  `controller'
+		require
+			not_is_degraded_mode: not processor.is_degraded_mode
+		do
+			Result := processor.pwm
+		end
+
+feature -- Access
 
 	memory_size: NATURAL_32
 			-- Constant representing amount of memory in this Pi
@@ -42,18 +104,18 @@ feature -- Access
 		once
 			n := revision_code.bit_and (Memory_size_mask).bit_shift_right (20)
 			inspect n
-			when 0 then  Result := {PI_CONSTANTS}.Memory_256mb
-			when 1 then  Result := {PI_CONSTANTS}.Memory_512mb
-			when 2 then  Result := {PI_CONSTANTS}.Memory_1gb
-			when 3 then  Result := {PI_CONSTANTS}.Memory_2gb
-			when 4 then  Result := {PI_CONSTANTS}.Memory_4gb
-			when 5 then  Result := {PI_CONSTANTS}.Memory_8gb
+			when 0 then  Result := {RPI_CONSTANTS}.Memory_256mb
+			when 1 then  Result := {RPI_CONSTANTS}.Memory_512mb
+			when 2 then  Result := {RPI_CONSTANTS}.Memory_1gb
+			when 3 then  Result := {RPI_CONSTANTS}.Memory_2gb
+			when 4 then  Result := {RPI_CONSTANTS}.Memory_4gb
+			when 5 then  Result := {RPI_CONSTANTS}.Memory_8gb
 			else
 --				check
 --					not_support: false
 --						-- should not happen
 --				end
-				Result := {PI_CONSTANTS}.Unknown
+				Result := {RPI_CONSTANTS}.Unknown
 			end
 		end
 
@@ -65,22 +127,22 @@ feature -- Access
 		once
 			n := revision_code.bit_and (Manufacturer_mask).bit_shift_right (16)
 			inspect n
-			when 0 then  Result := {PI_CONSTANTS}.Manufacturer_sony_uk
-			when 1 then  Result := {PI_CONSTANTS}.Manufacturer_egoman
-			when 2 then  Result := {PI_CONSTANTS}.Manufacturer_embest
-			when 3 then  Result := {PI_CONSTANTS}.Manufacturer_sony_japan
-			when 4 then  Result := {PI_CONSTANTS}.Manufacturer_embest
-			when 5 then  Result := {PI_CONSTANTS}.Manufacturer_stadium
+			when 0 then  Result := {RPI_CONSTANTS}.Manufacturer_sony_uk
+			when 1 then  Result := {RPI_CONSTANTS}.Manufacturer_egoman
+			when 2 then  Result := {RPI_CONSTANTS}.Manufacturer_embest
+			when 3 then  Result := {RPI_CONSTANTS}.Manufacturer_sony_japan
+			when 4 then  Result := {RPI_CONSTANTS}.Manufacturer_embest
+			when 5 then  Result := {RPI_CONSTANTS}.Manufacturer_stadium
 			else
 --				check
 --					not_support: false
 --						-- should not happen
 --				end
-				Result := {PI_CONSTANTS}.Unknown
+				Result := {RPI_CONSTANTS}.Unknown
 			end
 		end
 
-	processor: NATURAL_32
+	processor_number: NATURAL_32
 			-- Constant representing the type processor
 			-- Use `constant_as_string' to get a string representation.
 		local
@@ -88,16 +150,16 @@ feature -- Access
 		once
 			n := (revision_code.bit_and (Processor_mask)).bit_shift_right (12)
 			inspect n
-			when 0 then  Result := {PI_CONSTANTS}.Processor_bcm2835
-			when 1 then  Result := {PI_CONSTANTS}.Processor_bcm2836
-			when 2 then  Result := {PI_CONSTANTS}.Processor_bcm2837
-			when 3 then  Result := {PI_CONSTANTS}.Processor_bcm2711
+			when 0 then  Result := {RPI_CONSTANTS}.Processor_bcm2835
+			when 1 then  Result := {RPI_CONSTANTS}.Processor_bcm2836
+			when 2 then  Result := {RPI_CONSTANTS}.Processor_bcm2837
+			when 3 then  Result := {RPI_CONSTANTS}.Processor_bcm2711
 			else
 --				check
 --					not_supported: false
 --						-- should not happen
 --				end
-				Result := {PI_CONSTANTS}.Unknown
+				Result := {RPI_CONSTANTS}.Unknown
 			end
 		end
 
@@ -109,27 +171,27 @@ feature -- Access
 		once
 			n := revision_code.bit_and (Model_mask).bit_shift_right (4)
 			inspect n
-			when 0 then  Result := {PI_CONSTANTS}.Model_a
-			when 1 then  Result := {PI_CONSTANTS}.Model_b
-			when 2 then  Result := {PI_CONSTANTS}.Model_a_plus
-			when 3 then  Result := {PI_CONSTANTS}.Model_b_plus
-			when 4 then  Result := {PI_CONSTANTS}.Model_2b
-			when 5 then  Result := {PI_CONSTANTS}.Model_alpha
-			when 6 then  Result := {PI_CONSTANTS}.Model_cm1
-			when 8 then  Result := {PI_CONSTANTS}.Model_3b
-			when 9 then  Result := {PI_CONSTANTS}.Model_zero
-			when 10 then  Result := {PI_CONSTANTS}.Model_cm3
-			when 12 then  Result := {PI_CONSTANTS}.Model_zero_w
-			when 13 then  Result := {PI_CONSTANTS}.Model_3b_plus
-			when 14 then  Result := {PI_CONSTANTS}.Model_3a_plus
-			when 16 then  Result := {PI_CONSTANTS}.Model_cm3_plus
-			when 17 then  Result := {PI_CONSTANTS}.Model_4b
+			when 0 then  Result := {RPI_CONSTANTS}.Model_a
+			when 1 then  Result := {RPI_CONSTANTS}.Model_b
+			when 2 then  Result := {RPI_CONSTANTS}.Model_a_plus
+			when 3 then  Result := {RPI_CONSTANTS}.Model_b_plus
+			when 4 then  Result := {RPI_CONSTANTS}.Model_2b
+			when 5 then  Result := {RPI_CONSTANTS}.Model_alpha
+			when 6 then  Result := {RPI_CONSTANTS}.Model_cm1
+			when 8 then  Result := {RPI_CONSTANTS}.Model_3b
+			when 9 then  Result := {RPI_CONSTANTS}.Model_zero
+			when 10 then  Result := {RPI_CONSTANTS}.Model_cm3
+			when 12 then  Result := {RPI_CONSTANTS}.Model_zero_w
+			when 13 then  Result := {RPI_CONSTANTS}.Model_3b_plus
+			when 14 then  Result := {RPI_CONSTANTS}.Model_3a_plus
+			when 16 then  Result := {RPI_CONSTANTS}.Model_cm3_plus
+			when 17 then  Result := {RPI_CONSTANTS}.Model_4b
 			else
 --				check
 --					not_support: false
 --						-- should not happen
 --				end
-				Result := {PI_CONSTANTS}.Unknown
+				Result := {RPI_CONSTANTS}.Unknown
 			end
 		end
 
@@ -185,7 +247,7 @@ feature -- Basic operations
 			else
 				io.put_string ("    Model:  " + constant_as_string (model_type) + "%N")
 				io.put_string ("    Manufacturer:  " + constant_as_string (manufacturer) + "%N")
-				io.put_string ("    Processor:  " + constant_as_string (processor) + "%N")
+				io.put_string ("    Processor:  " + constant_as_string (processor_number) + "%N")
 				io.put_string ("    Memory:  " + constant_as_string (memory_size) + "%N")
 				io.put_string ("    Revision:  " + constant_as_string (revision) + "%N")
 			end
@@ -314,3 +376,4 @@ feature {NONE} -- Externals
 
 
 end
+

@@ -7,7 +7,7 @@ note
 	date: "9/25/20"
 
 class
-	PI_CONSTANTS
+	RPI_CONSTANTS
 
 feature -- Access
 
@@ -103,9 +103,6 @@ feature -- Querry
 				Result := a_constant.out
 			end
 		end
-
-feature {NONE} -- Implementation
-
 
 end
 

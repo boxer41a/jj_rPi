@@ -6,9 +6,6 @@ note
 class
 	DEMO
 
-inherit
-
-	PI_SHARED
 
 create
 	make
@@ -19,12 +16,14 @@ feature {NONE} -- Initialization
 			-- Run application.
 		do
 			clear_screen
-			pi.show_revision_information
+			create rpi
+			rpi.show_revision_information
+
 --			run_gpio_tests
 			chap_1_led (10)
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
-			if not pi.is_degraded_mode then
+			if not rpi.processor.is_degraded_mode then
 --				chap_4_pwm_led (1)
 				pwm_motor_run (4)
 			end
@@ -34,7 +33,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
---	pi: PI_4_CONTROLLER
+	rpi: RPI
 			-- To test the system
 
 feature -- Basic operations
@@ -80,9 +79,9 @@ feature -- Basic operations
 			led: LED
 		do
 			print ("Blink an LED %N")
-			pi.pin_17.set_mode ({GPIO_PIN_CONSTANTS}.Output)
+			rpi.pin (17).set_mode ({GPIO_PIN_CONSTANTS}.Output)
 			sleep
-			create led.connect (pi.pin_17)
+			create led.connect (rpi.pin (17))
 			from i := 1
 			until i > a_count
 			loop
@@ -107,8 +106,8 @@ feature -- Basic operations
 			button: BUTTON
 		do
 			print ("Hold button to turn LED on/off %N")
-			create led.connect (pi.pin_1)
-			create button.connect (pi.pin_18)
+			create led.connect (rpi.pin (1))
+			create button.connect (rpi.pin (18))
 			from i := 1
 			until i > a_count
 			loop
@@ -135,8 +134,8 @@ feature -- Basic operations
 		do
 				-- Use default debounce time from {BUTTON}
 			print ("Press button for more than 1 second to toggle LED on/off %N")
-			create led.connect (pi.pin_17)
-			create button.connect (pi.pin_18)
+			create led.connect (rpi.pin (17))
+			create button.connect (rpi.pin (18))
 			from i := 1
 			until i > a_count
 			loop
@@ -182,23 +181,23 @@ feature -- Basic operations
 			n: NATURAL_32
 		do
 			print ("LED should get bright then dim %N")
-			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
-			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
-			pi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
-			pi.pwm.enable_channel (0, 1)
-			pi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
-			pi.pin_18.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
+			rpi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			rpi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			rpi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
+			rpi.pwm.enable_channel (0, 1)
+			rpi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			rpi.pin (18).set_mode ({GPIO_PIN_CONSTANTS}.alt5)
 --			pi.clocks.show ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 --			pi.pwm.show (0, 1)
 				-- Do it `a_count' times
 			from i := 1
 			until i > a_count
 			loop
-				n := pi.pwm.range (0, 1)
+				n := rpi.pwm.range (0, 1)
 				from v := 0
 				until v > n
 				loop
-					pi.pwm.set_data (0, 1, v)	-- sets data register
+					rpi.pwm.set_data (0, 1, v)	-- sets data register
 --					pi.pwm.show (0, 1)
 					v := v + 1
 					sleep
@@ -207,17 +206,17 @@ feature -- Basic operations
 				from v := n
 				until v <= 0
 				loop
-					pi.pwm.set_data (0, 1, v)	-- sets data register
+					rpi.pwm.set_data (0, 1, v)	-- sets data register
 --					pi.pwm.show (0, 1)
 					v := v - 1
 					sleep
 				end
 				i := i + 1
 					-- For competeness, go down to zero
-				pi.pwm.set_data (0, 1, 0)		-- sets data register
+				rpi.pwm.set_data (0, 1, 0)		-- sets data register
 			end
-			pi.pwm.disable_channel (0, 1)
-			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			rpi.pwm.disable_channel (0, 1)
+			rpi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 			print ("%N")
 		end
 
@@ -234,14 +233,14 @@ feature -- Basic operations
 			print ("%N")
 			print ("DEMO.pwm_motor_run %N")
 				-- Set up clock and PWM
-			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
-			pi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
-			pi.pwm.enable_channel (0, 1)
-			pi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			rpi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			rpi.clocks.set_frequency ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index, 500_000, 0)
+			rpi.pwm.enable_channel (0, 1)
+			rpi.clocks.enable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 				-- For convenience, assign pins to local variables
-			enab := pi.pin_18
-			in_1 := pi.pin_21
-			in_2 := pi.pin_17
+			enab := rpi.pin (18)
+			in_1 := rpi.pin (21)
+			in_2 := rpi.pin (17)
 				-- Set the enable pin to alt5 mode, which is PWM,
 				-- and the two control pins to output mode.
 			enab.set_mode ({GPIO_PIN_CONSTANTS}.alt5)
@@ -274,8 +273,8 @@ feature -- Basic operations
 				i := i + 1
 			end
 			mot.stop
-			pi.pwm.disable_channel (0, 1)
-			pi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
+			rpi.pwm.disable_channel (0, 1)
+			rpi.clocks.disable ({GPIO_CLOCK_CONSTANTS}.clock_pwm_index)
 			print ("%N")
 			enab.set_mode ({GPIO_PIN_CONSTANTS}.output)
 			enab.set_state ({GPIO_PIN_CONSTANTS}.Low)

@@ -26,6 +26,7 @@ feature {NONE}-- Initialization
 	make (a_file_descriptor: INTEGER_32; a_length: INTEGER_32; a_address: NATURAL_32)
 			-- Initialize Current
 		do
+			controller := (create {RPI}).processor
 				-- Precursor sets the `base_address'
 			Precursor {PERIPHERAL} (a_file_descriptor, a_length, a_address)
 				-- GPFSELx registers
@@ -112,13 +113,16 @@ feature {NONE}-- Initialization
 
 feature -- Access
 
+	controller: RPI_PROCESSOR
+			-- The controller on which the system is running.
+			-- Remember, {RPI_PROCESSOR} is a once class
 
 feature -- Query
 
 	is_valid_pin_number (a_number: INTEGER_32): BOOLEAN
 			-- Is `a_number' within proper range
 		do
-			Result := a_number >= pi.pin_0.number and a_number <= pi.pin_last.number
+			Result := a_number >= 0 and a_number <= controller.pin_count - 1
 		end
 
 	pull_state_on_pin (a_number: INTEGER): NATURAL_32
@@ -235,7 +239,7 @@ feature -- Basic operations
 			-- Some functions run for x amount of time,
 			-- so can't just set mode until some condition?
 		do
-			io.put_string ("{PI_CONTROLLER}.terminate_mode:  Fix me! %N")
+			io.put_string ("{RPI_PROCESSOR}.terminate_mode:  Fix me! %N")
 ---			check
 --				fix_me:  false
 --					-- because

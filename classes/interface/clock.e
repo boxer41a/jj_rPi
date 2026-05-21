@@ -34,16 +34,6 @@ PI_HW_CLK_MAX_FREQ_2711 375000000
 class
 	CLOCK
 
-inherit
-
-	ANY
-
-	PI_SHARED
-		export
-			{NONE}
-				all
-		end
-
 inherit {NONE}
 
 	GPIO_CLOCK_CONSTANTS

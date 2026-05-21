@@ -1,22 +1,12 @@
 note
 	description: "[
-		Represents one of the GPIO pins on a {PI_CONTROLLER}.
+		Represents one of the GPIO pins on a {RPI_PROCESSOR}.
 		]"
 	author: "Jimmy J Johnson"
 	date: "10/23/18"
 
 class
 	GPIO_PIN
-
-inherit
-
-	ANY
-
-	PI_SHARED
-		export
-			{NONE}
-				all
-		end
 
 create
 	make
@@ -30,6 +20,7 @@ feature {NONE} -- Initialization
 		do
 			create function_table.make (10)
 			number := a_pin
+			pi := (create {RPI}).processor
 		end
 
 feature -- Initialization
@@ -56,6 +47,9 @@ feature -- Initialization
 		end
 
 feature -- Access
+
+	pi: RPI_PROCESSOR
+			-- The controller on which Current resides
 
 	name: STRING_8
 			-- The name of the pin (e.g. "GPIO 1")

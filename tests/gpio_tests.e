@@ -22,11 +22,6 @@ inherit
 			as_named
 		end
 
-	PI_SHARED
-		undefine
-			default_create
-		end
-
 feature {NONE} -- Events
 
 	on_prepare
@@ -35,6 +30,8 @@ feature {NONE} -- Events
 		do
 			add_valid_target_type ("REGISTER")
 			add_valid_target_type ("GPIO")
+			create rpi
+			gpio := rpi.gpio
 		end
 
 feature -- Constants
@@ -67,7 +64,7 @@ feature -- Basic operations
 		do
 			divider ("set_pull_state_on_pin")
 			from i := 0
-			until i > pi.pin_last.number
+			until i > rpi.processor.last_pin.number
 			loop
 				procedure (agent gpio.set_pull_state_on_pin (i, {GPIO_PIN_CONSTANTS}.Pull_none), "set_pull_state_on_pin (Pull_none)")
 				function (agent gpio.pull_state_on_pin (i), "pull_state_on_pin", {GPIO_PIN_CONSTANTS}.Pull_none)
@@ -86,7 +83,7 @@ feature -- Basic operations
 		do
 			divider ("set_mode_on_pin")
 			from i := 0
-			until i > pi.pin_last.number
+			until i > rpi.processor.last_pin.number
 			loop
 				procedure (agent gpio.set_mode_on_pin (i, {GPIO_PIN_CONSTANTS}.Input), "set_mode_on_pin (Input)")
 				function (agent gpio.mode_on_pin (i), "mode_on_pin", {GPIO_PIN_CONSTANTS}.Input)
@@ -116,14 +113,14 @@ feature -- Basic operations
 			divider ("write_signal_on_pin")
 				-- Set all pins to output mode
 			from i := 0
-			until i > pi.pin_last.number
+			until i > rpi.processor.last_pin.number
 			loop
 				procedure (agent gpio.set_mode_on_pin (i, {GPIO_PIN_CONSTANTS}.Output), "set_mode_on_pin")
 				i := i + 1
 			end
 				-- Set output to high or low
 			from i := 0
-			until i > pi.pin_last.number
+			until i > rpi.processor.last_pin.number
 			loop
 				if i /= 10 then
 
@@ -153,11 +150,10 @@ feature {NONE} -- Implementation
 
 feature {NONE} -- Implementation
 
-	gpio: GPIO
-			-- Obtained from featue `pi' in {SHARED}
-		attribute
-			Result := pi.gpio
-		end
+	rpi: RPI
+			-- To access the underlying machine
 
+	gpio: GPIO
+			-- To access the GPIO pins
 
 end

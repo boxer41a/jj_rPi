@@ -28,11 +28,6 @@ inherit
 			default_create
 		end
 
-	PI_SHARED
-		undefine
-			default_create
-		end
-
 feature {NONE} -- Events
 
 	on_prepare
@@ -49,10 +44,9 @@ feature -- Basic operations
 	run_all
 			-- Demo/test all features
 		local
-			test: PI_CONTROLLER
+			test: RPI_PROCESSOR
 		do
 				-- Force call to once feature
-			test := pi
 			test_access_features
 --			test_element_change_features
 		end
@@ -84,7 +78,7 @@ feature -- Implementation
 			-- A simple read-write register with no reserved bits, etc.
 			-- Pick one from the {GPIO}
 		once
-			Result := pi.gpio.gpren_0
+			Result := (create {RPI}).gpio.gpren_0
 		end
 
 end
