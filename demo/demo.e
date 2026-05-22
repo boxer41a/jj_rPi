@@ -19,7 +19,7 @@ feature {NONE} -- Initialization
 			create rpi
 			rpi.show_revision_information
 
---			run_gpio_tests
+			run_gpio_tests
 			chap_1_led (10)
 --			chap_2_button_and_led (20)
 --			chap_2_debounce_button_and_led (10)
@@ -67,8 +67,8 @@ feature -- Basic operations
 			t: GPIO_TESTS
 		do
 			create t
-			t.test_pull_state_features
 			t.test_mode_features
+			t.test_pull_state_features
 			t.test_signal_features
 		end
 

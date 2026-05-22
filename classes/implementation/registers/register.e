@@ -64,7 +64,9 @@ feature -- Access
 				-- ...then ensure "don't-care" bits to zero
 --			Result := filtered (Result)
 			Result := Result.bit_and (reserved_mask.bit_not)
-			Result := Result.bit_and (password_mask.bit_not)
+			if is_password_required then
+				Result := Result.bit_and (password_mask.bit_not)
+			end
 		ensure
 			no_password_returned: is_password_required implies Result.bit_and (password_mask) = 0
 			no_reserved_bits_returned: Result.bit_and (reserved_mask) = 0
