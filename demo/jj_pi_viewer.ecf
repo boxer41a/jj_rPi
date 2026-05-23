@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+﻿<?xml version="1.0" encoding="ISO-8859-1"?>
 <system xmlns="http://www.eiffel.com/developers/xml/configuration-1-22-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-22-0 http://www.eiffel.com/developers/xml/configuration-1-22-0.xsd" name="pi_viewer_application" uuid="EDAEDE58-4F7C-4C26-96F7-04C795F8DBA0">
 	<target name="pi_viewer_application">
-		<root cluster="rpi_viewer" class="PI_VIEWER_APPLICATION" feature="make_and_launch"/>
+		<root cluster="rpi_viewer" class="RPI_VIEWER" feature="make_and_launch"/>
 		<file_rule>
 			<exclude>/CVS$</exclude>
 			<exclude>/EIFGENs$</exclude>
@@ -18,11 +18,13 @@
 		</capability>
 		<precompile name="vision2_pre" location="$ISE_PRECOMP\vision2-scoop-safe.ecf"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
-
-		<library name="jj_rpi" location="..\classes\jj_rpi.ecf"/>
+		<library name="jj_rpi" location="..\jj_rpi.ecf" readonly="false"/>
 		<library name="jj_vision" location="$JJ_GITHUB\jj_vision\jj_vision.ecf" readonly="false"/>
-		<library name="vision2" location="$ISE_LIBRARY\library\vision2\vision2.ecf"/>
-
+		<library name="vision2" location="$ISE_LIBRARY\library\vision2\vision2.ecf">
+			<class_option class="EV_FONT">
+				<warning name="obsolete_feature" value="all"/>
+			</class_option>
+		</library>
 		<cluster name="rpi_viewer" location="..\rpi_viewer\"/>
 	</target>
 </system>

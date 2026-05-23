@@ -1,21 +1,22 @@
 note
 	description: "[
-		Models the BCM2711 Processor, which is used by the Raspberry Pi 4b,
+		Simulates the processor in a Raspberry Pi 4b (i.e. the BCM2711),
 		defining the offsets for the periferals.
+		These offsets will be into a memory area mapped to a temp file.
 		]"
 	author: "Jimmy J. Johnson"
-	date: "5/21/26"
+	date: "5/22/26"
 
 once class
-	BCM2711_PROCESSOR
+	SIMULATED_PROCESSOR
 
 inherit
 
 	RPI_PROCESSOR
 		redefine
 			default_create,
+			initialize_peripherals,
 			expected_pin_count
---			header
 		end
 
 create
@@ -33,6 +34,27 @@ feature {NONE} -- Initialization
 	Expected_pin_count: INTEGER = 27
 			-- The number of pins available on this RPi.
 			-- Used during creation features.
+
+	initialize_peripherals
+			-- Set the addresses for the peripherals
+		local
+			a: ANY
+			add: NATURAL_32
+		do
+			gpio_clocks_fd := memory_file_descriptor ("gpio_clocks")
+			gpio_fd := memory_file_descriptor ("gpio")
+			pcm_fd := memory_file_descriptor ("pcm")
+			bcs_fd := memory_file_descriptor ("bcs")
+			pwm_fd := memory_file_descriptor ("pwm")
+			uart_fd := memory_file_descriptor ("uart")
+			dma_fd := memory_file_descriptor ("dma")
+			interupts_fd := memory_file_descriptor ("interupts")
+			add := peripheral_base_address
+				-- Create the peripherals
+			create gpio_imp.make (gpio_fd, gpio_map_length, add + gpio_offset)
+			create clocks_imp.make (gpio_clocks_fd, clocks_map_length, add + gpio_clocks_offset)
+			create pwm_imp.make (pwm_fd, pwm_map_length, add + pwm_offset)
+		end
 
 	initialize_pin_functions
 			-- Add default (input and output) and alternate functions
@@ -211,58 +233,101 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
--- fix me?  Do I need the other pins? The ones not on header?	
+	peripheral_base_address: NATURAL_32 = 0x00000000
+			-- Physical address of the periferal memory area.  The specific periferals
+			-- reside at some offset from this address.
+			-- This simulator uses a separate mapped file for each peripheral,
+			-- so, simply start memory at the beginning of the
+			-- mapped memory file (see `memory_file_descriptor').
+			-- The offsets are in order by memory location as defined in
+			-- the BCM2711 ARM Peripherals document.
 
-feature -- Access
-
-	peripheral_base_address: NATURAL_32 = 0xFE000000
-			-- Start address of the peripheral memory area.  The specific
-			-- peripherals reside at some offset from this address.  (See below)
-			-- Specific for this model.
-			-- Not sure where this number originates, but it is in WiringPi
-			-- and other software, and it seems to work.
-
-	gpio_clocks_offset: NATURAL_32 = 0x00101000
+	gpio_clocks_offset: NATURAL_32 = 0x00000000		-- 0x00101000
 			-- Offset from `peripheral_base_address' to GPIO clock registers.
-			-- BCM2711 ARM Peripherals, page 104
+			-- Requires 88 bytes.
 
-	gpio_offset: NATURAL_32 = 0x00200000
+	gpio_offset: NATURAL_32 = 0x0		--0x0000100		-- 0x00200000
 			-- Offset from `peripheral_base_address' to GPIO registers.
-			-- BCM2711 ARM Peripherals, page 82
+			-- Requires 244 bytes.
 
--- 	pcm_offset: NATURAL_32 = 0x00203000
+-- 	pcm_offset: NATURAL_32 = 0x0		--0x00000400		-- 0x00203000
  			-- Offset from `peripheral_base_address' to PCM/I2S Audio
-			-- BCM2711 ARM Peripherals, page 144
+ 			-- Requires 24 bytes.
 
--- 	bcs_offset: NATURAL_32 = 0x00205000
+-- 	bcs_offset: NATURAL_32 = 0x0		--0x00000500		-- 0x00205000
  			-- Offset from `peripheral_base_address' to PCM/I2S Audio
-			-- BCM2711 ARM Peripherals, page 31
+ 			-- Requires 3,096 bytes.
 
-
-	pwm_offset: NATURAL_32 = 0x0020C000
+ 	pwm_offset: NATURAL_32 = 0x0		--0x00003600		-- 0x0020C000
 			-- Offsett from `peripheral_base_address' to the PWM registers.
-			-- BCM2711 ARM Peripherals, page 158
+			-- Requires 828 bytes
 
---	uart_offset: NATURAL_32 =  0x00215000
+--	uart_offset: NATURAL_32 = 	0x0		--0x00003F00	-- 0x00215000
 			-- Offsett from `peripheral_base_address' to the UART registers.
+			-- Requires 100 bytes
 
--- 	dma_offset: NATURAL_32 = 0x00E05000
+-- 	dma_offset: NATURAL_32 = 0x0		--0x00004000		-- 0x00E05000
 			-- Offsett from `peripheral_base_address' to the DMA registers.
+			-- Requires 4,048 bytes bytes
 
--- 	interupts_offset: NATURAL_32 = 0x00004200		-- 0xFF840000
+-- 	interupts_offset: NATURAL_32 = 0x0		--0x00004200		-- 0xFF840000
 			-- Offsett from `peripheral_base_address' to the DMA registers.
 			-- Low Peripheral mode required for offset 0xFF84 0000, otherwise
-			-- offset is 0x4 C004 0000.
+			-- offset is 0x4_C004_0000.
+			-- Requires 124 bytes bytes
 
 
+feature {NONE} -- Implementation
 
+	gpio_clocks_fd: INTEGER_32
+			-- File descriptor for mapping memory for the GPIO Clocks peripheral.
 
---	header: PI_HEADER_MAP_40_PIN
-			-- Mapping from a {GPIO_PIN} (i.e. BCM or Broadcom
-			-- numbering scheme) to the physical pin number.
+	gpio_fd: INTEGER_32
+			-- File descriptor for mapping memory for the GPIO peripheral.
 
---	gpio_base_address: NATURAL_32 = 0x7E21_5000
-			-- GPIO register base address per BCM2711 ARM Peripherals
-			-- Manual, page 83.  Seems to be wrong; see `gpio_offset'.
+	pcm_fd: INTEGER_32
+			-- File descriptor for mapping memory for the PCM/I2S Audio peripheral.
+
+	bcs_fd: INTEGER_32
+			-- File descriptor for mapping memory for the BCS peripheral.
+
+	pwm_fd: INTEGER_32
+			-- File descriptor for mapping memory for the PWM peripheral.
+
+	uart_fd: INTEGER_32
+			-- File descriptor for mapping memory for the UART peripheral.
+
+	dma_fd: INTEGER_32
+			-- File descriptor for mapping memory for the DMA peripheral.
+
+	interupts_fd: INTEGER_32
+			-- File descriptor for mapping memory for the Interupts peripheral.
+
+	memory_file_descriptor (a_filename: STRING_8): INTEGER_32
+			-- Create a file for mapping a simulated paripheral to memory,
+			-- returning a "file_descriptor" for that file.
+			-- The resulting file will contain 4096 bytes, which is enough
+			-- to handle the perfipheral with the most registers.
+		local
+			f: RAW_FILE
+			n: NATURAL_32
+			i: INTEGER_32
+			a: ANY
+		do
+			create f.make_open_write (a_filename)
+				-- Each 32-bit natural (4 bytes) simulates one RPI register.
+				-- 8,800 bytes required for offsets listed above.
+			from i := 1
+			until i > 4096 // 4
+			loop
+				f.put_natural_32 (n)	-- writes a zero
+				i := i + 1
+			end
+			f.close
+			a := (a_filename).to_c
+			Result := c_open_file ($a)
+		ensure
+			is_memory_file_opened: Result /= -1
+		end
 
 end

@@ -44,10 +44,9 @@ feature {NONE} -- Initialization
 			when {RPI_CONSTANTS}.Processor_bcm2711 then
 				create {BCM2711_PROCESSOR} processor
 			else
-					-- Assume Pi-4 platform for testing?
-				create {BCM2711_PROCESSOR} processor
+					-- Assume non Pi-4 platform for testing
+				create {SIMULATED_PROCESSOR} processor
 			end
-
 		end
 
 feature -- Access
@@ -96,6 +95,31 @@ feature -- Access
 
 feature -- Access
 
+	revision_code: NATURAL_32
+			-- Revision hex code as determined from "/proc/cpuinfo"
+			--
+			-- https://www.raspberrypi.org/documentation/hardware/
+			-- raspberrypi/revision-codes/README.md.
+			--
+			-- The following masks are used to decode the `revision_code' with
+			-- format:
+			--	  NOQu uuWu FMMM CCCC PPPP TTTT TTTT RRRR
+			--	
+			--	u	unused.
+			--
+			--    N     Overvoltage      0: allowed, 1: disallowed
+			--    O     OTP Programming  0: allowed, 1: disallowed
+			--    Q     OTP Reading      0: allowed, 1: disallowed
+			--    W     Warranty         0: intact,	1: voided
+			--    F     Style            0: old style, 1: new style
+			--    MMM   Memory:          256KB up to 8GB (See feature `')
+			--    CCCC  Manufacturer     (See feature `')
+			--    PPPP  Processor        0: BCM2835, ect (See feature `')
+			--    TTTTTTTT    Type       A, B, A+, B+, 4B, etc. (See feature `')
+		once
+			Result := c_revision
+		end
+
 	memory_size: NATURAL_32
 			-- Constant representing amount of memory in this Pi
 			-- Use `constant_as_string' to get a string representation.
@@ -110,6 +134,38 @@ feature -- Access
 			when 3 then  Result := {RPI_CONSTANTS}.Memory_2gb
 			when 4 then  Result := {RPI_CONSTANTS}.Memory_4gb
 			when 5 then  Result := {RPI_CONSTANTS}.Memory_8gb
+			else
+--				check
+--					not_support: false
+--						-- should not happen
+--				end
+				Result := {RPI_CONSTANTS}.Unknown
+			end
+		end
+
+	model_type: NATURAL_32
+			-- Constant representing the model (e.g. A, B, 4b, etc)
+			-- Use `constant_as_string' to get a string representation.
+		local
+			n: NATURAL_32
+		once
+			n := revision_code.bit_and (Model_mask).bit_shift_right (4)
+			inspect n
+			when 0 then  Result := {RPI_CONSTANTS}.Model_a
+			when 1 then  Result := {RPI_CONSTANTS}.Model_b
+			when 2 then  Result := {RPI_CONSTANTS}.Model_a_plus
+			when 3 then  Result := {RPI_CONSTANTS}.Model_b_plus
+			when 4 then  Result := {RPI_CONSTANTS}.Model_2b
+			when 5 then  Result := {RPI_CONSTANTS}.Model_alpha
+			when 6 then  Result := {RPI_CONSTANTS}.Model_cm1
+			when 8 then  Result := {RPI_CONSTANTS}.Model_3b
+			when 9 then  Result := {RPI_CONSTANTS}.Model_zero
+			when 10 then  Result := {RPI_CONSTANTS}.Model_cm3
+			when 12 then  Result := {RPI_CONSTANTS}.Model_zero_w
+			when 13 then  Result := {RPI_CONSTANTS}.Model_3b_plus
+			when 14 then  Result := {RPI_CONSTANTS}.Model_3a_plus
+			when 16 then  Result := {RPI_CONSTANTS}.Model_cm3_plus
+			when 17 then  Result := {RPI_CONSTANTS}.Model_4b
 			else
 --				check
 --					not_support: false
@@ -163,42 +219,42 @@ feature -- Access
 			end
 		end
 
-	model_type: NATURAL_32
-			-- Constant representing the model (e.g. A, B, 4b, etc)
-			-- Use `constant_as_string' to get a string representation.
-		local
-			n: NATURAL_32
-		once
-			n := revision_code.bit_and (Model_mask).bit_shift_right (4)
-			inspect n
-			when 0 then  Result := {RPI_CONSTANTS}.Model_a
-			when 1 then  Result := {RPI_CONSTANTS}.Model_b
-			when 2 then  Result := {RPI_CONSTANTS}.Model_a_plus
-			when 3 then  Result := {RPI_CONSTANTS}.Model_b_plus
-			when 4 then  Result := {RPI_CONSTANTS}.Model_2b
-			when 5 then  Result := {RPI_CONSTANTS}.Model_alpha
-			when 6 then  Result := {RPI_CONSTANTS}.Model_cm1
-			when 8 then  Result := {RPI_CONSTANTS}.Model_3b
-			when 9 then  Result := {RPI_CONSTANTS}.Model_zero
-			when 10 then  Result := {RPI_CONSTANTS}.Model_cm3
-			when 12 then  Result := {RPI_CONSTANTS}.Model_zero_w
-			when 13 then  Result := {RPI_CONSTANTS}.Model_3b_plus
-			when 14 then  Result := {RPI_CONSTANTS}.Model_3a_plus
-			when 16 then  Result := {RPI_CONSTANTS}.Model_cm3_plus
-			when 17 then  Result := {RPI_CONSTANTS}.Model_4b
-			else
---				check
---					not_support: false
---						-- should not happen
---				end
-				Result := {RPI_CONSTANTS}.Unknown
-			end
-		end
-
 	revision: NATURAL_32
 			-- Revision number of this Pi
 		once
 			Result := revision_code.bit_and (Revision_mask)
+		end
+
+feature -- Access
+
+	memory_size_string: STRING
+			-- String representation of the `memory_size'
+		do
+			Result := constant_as_string (memory_size)
+		end
+
+	model_string: STRING
+			-- String representation of the `model_type'
+		do
+			Result := constant_as_string (model_type)
+		end
+
+	manufacturer_string: STRING
+			-- String representation of the `manufacturer'
+		do
+			Result := constant_as_string (manufacturer)
+		end
+
+	processor_string: STRING
+			-- String representation of the `processor_number'
+		do
+			Result := constant_as_string (processor_number)
+		end
+
+	revision_string: STRING
+			-- String representation of the `revision'
+		do
+			Result := constant_as_string (revision)
 		end
 
 feature -- Status report
@@ -215,7 +271,6 @@ feature -- Status report
 			Result := revision_code.bit_and (otp_programming_mask) = 0
 		end
 
-
 	is_otp_reading_allowed: BOOLEAN
 			-- Is one-time-programming (OTP) reading allowed for this Pi?
 		once
@@ -225,13 +280,13 @@ feature -- Status report
 	is_warranty_voided: BOOLEAN
 			-- Has the warranty on this Pi been voided?
 		once
-			Result := revision_code.bit_and (warranty_mask) = 1
+			Result := revision_code.bit_and (warranty_mask) /= 0
 		end
 
 	is_new_style: BOOLEAN
 			-- Is this a new revision style?
 		once
-			Result := revision_code.bit_and (style_mask) = 1
+			Result := revision_code.bit_and (style_mask) /= 0
 		end
 
 feature -- Basic operations
@@ -240,7 +295,7 @@ feature -- Basic operations
 			-- Display manufacturing information about this Pi
 		do
 			io.put_string ("%N")
-			io.put_string ("{SHARED}.show_revision_information: %N")
+			io.put_string ("{RPI}.show_revision_information: %N")
 			if revision = 0 then
 				io.put_string ("   No revision information available %N")
 				io.put_string ("   Must be in test mode.  %N")
@@ -255,31 +310,6 @@ feature -- Basic operations
 		end
 
 feature {NONE} -- Implementation
-
-	revision_code: NATURAL_32
-			-- Revision hex code as determined from "/proc/cpuinfo"
-			--
-			-- https://www.raspberrypi.org/documentation/hardware/
-			-- raspberrypi/revision-codes/README.md.
-			--
-			-- The following masks are used to decode the `revision_code' with
-			-- format:
-			--	  NOQu uuWu FMMM CCCC PPPP TTTT TTTT RRRR
-			--	
-			--	u	unused.
-			--
-			--    N     Overvoltage      0: allowed, 1: disallowed
-			--    O     OTP Programming  0: allowed, 1: disallowed
-			--    Q     OTP Reading      0: allowed, 1: disallowed
-			--    W     Warranty         0: intact,	1: voided
-			--    F     Style            0: old style, 1: new style
-			--    MMM   Memory:          256KB up to 8GB (See feature `')
-			--    CCCC  Manufacturer     (See feature `')
-			--    PPPP  Processor        0: BCM2835, ect (See feature `')
-			--    TTTTTTTT    Type       A, B, A+, B+, 4B, etc. (See feature `')
-		once
-			Result := c_revision
-		end
 
 	overvoltage_mask: NATURAL_32
 			-- Mask to interpret the `revision_code'

@@ -24,7 +24,7 @@ feature {NONE} -- Initialization
 			create pins.make (21)
 			initialize_pins
 			initialize_pin_functions
-			initialize_periferals
+			initialize_peripherals
 		ensure then
 --			is_expected_processor: is_expected_processor
 		end
@@ -50,14 +50,8 @@ feature {NONE} -- Initialization
 			end
 		end
 
-	initialize_pin_functions
-			-- Add default (input and output) and alternate functions
-			-- to each pin in Current
-		deferred
-		end
-
-	initialize_periferals
-			-- Create all the attributes
+	initialize_peripherals
+			-- Set the addresses for the peripherals
 		local
 			fd: INTEGER_32 	-- file descriptor
 			a: ANY
@@ -66,63 +60,92 @@ feature {NONE} -- Initialization
 --			create header.make
 				-- Use mmap (in `c_open_file') to give access to memory
 			a := ("/dev/mem").to_c
-print ("{RPI_PROCESSOR}.create_interface_objects:  %N")
-print ("            generating_type of `a' is {" + a.generating_type + "} %N")
 			fd := c_open_file ($a)
 			if fd > 0 then
 					-- All functions available
 				add := peripheral_base_address
-				print ("{RPI_PROCESSOR}.make:  `perpheral_base_address = " + add.out + "%N")
 			else
 				a := ("/dev/gpiomem").to_c
 				fd := c_open_file ($a)
 				if fd > 0 then
 					is_degraded_mode := true
 				else
-					is_test_mode := true
+					is_peripheral_initialization_failed := true
 				end
 			end
 				-- Create the peripherals
-			if is_test_mode then
-					-- Must not be on a Pi, so simulate by mapping using a file
-				build_test_file
-				a := ("test_file").to_c
-				fd := c_open_file ($a)
-				create gpio_imp.make (fd, gpio_map_length, 0)  --gpio_offset)
-				create clocks_imp.make (fd, clocks_map_length, Block_size.to_natural_32)  --gpio_clocks_offset)
-				create pwm_imp.make (fd, pwm_map_length, (Block_size * 2).to_natural_32)  --pwm_offset)
-			elseif is_degraded_mode then
-					-- The GPIO is the only {PERIPHERAL} available
-				create gpio_imp.make(fd, gpio_map_length, gpio_offset)
-			else
-					-- Must be running on a Pi as sudo, so all peripherals available
-				create gpio_imp.make (fd, gpio_map_length, add + gpio_offset)
-				create clocks_imp.make (fd, clocks_map_length, add + gpio_clocks_offset)
-				create pwm_imp.make (fd, pwm_map_length, add + pwm_offset)
+			if not is_peripheral_initialization_failed then
+				if is_degraded_mode then
+						-- The GPIO is the only {PERIPHERAL} available
+					create gpio_imp.make(fd, gpio_map_length, gpio_offset)
+				else
+						-- Must be running on a Pi as sudo, so all peripherals available
+					create gpio_imp.make (fd, gpio_map_length, add + gpio_offset)
+					create clocks_imp.make (fd, clocks_map_length, add + gpio_clocks_offset)
+					create pwm_imp.make (fd, pwm_map_length, add + pwm_offset)
+				end
 			end
+		ensure
+			is_periferals_initialized: not is_peripheral_initialization_failed
 		end
 
-	build_test_file
-			-- Create a test file that can later be mmapped to simulate
-			-- running on a Pi
-		local
-			f: RAW_FILE
-			n: NATURAL_32	-- 4 bytes
-			i: INTEGER_32
-		do
-				-- Create and open the file for writing
-			create f.make_open_write ("test_file")
-				-- Write four block's worth of data
-				-- (at 32-bits per write)
-			from i := 1
-			until i > block_size * 3
-			loop
-					-- Just write zeros
-				f.put_natural_32 (n)
-				i := i + 1
-			end
-			f.close
+	initialize_pin_functions
+			-- Add default (input and output) and alternate functions
+			-- to each pin in Current
+		deferred
 		end
+
+feature -- Access
+
+	peripheral_base_address: NATURAL_32
+			-- Physical address of the periferal memory area.  The specific periferals
+			-- reside at some offset from this address.
+		deferred
+		end
+--		do
+--			Result := c_get_host_address
+--		end
+
+	gpio_clocks_offset: NATURAL_32
+			-- Offset from `peripheral_base_address' to GPIO clock registers.
+		deferred
+		end
+
+	gpio_offset: NATURAL_32
+			-- Offset from `peripheral_base_address' to GPIO registers.
+		deferred
+		end
+
+-- 	pcm_offset: NATURAL_32 = 0x00203000
+-- 			-- Offset from `peripheral_base_address' to PCM/I2S Audio registers
+--		deferred
+--		end
+
+---- 	bcs_offset: NATURAL_32 = 0x00205000
+-- 			-- Offset from `peripheral_base_address' to BCS/I2C registers
+--		deferred
+--		end
+
+	pwm_offset: NATURAL_32
+			-- Offsett from `peripheral_ase_address' to the PWM registers.
+		deferred
+		end
+
+--	uart_offset: NATURAL_32
+--			 Offsett from `peripheral_base_address' to the UART registers.
+--		deferred
+--		end
+
+-- 	dma_offset: NATURAL_32
+--			 Offsett from `peripheral_base_address' to the DMA registers.
+--		deferred
+--		end
+
+-- 	interupts_offset: NATURAL_32
+--			-- Offsett from `peripheral_base_address' to the DMA registers.
+--			-- Low Peripheral mode required for offset 0xFF84 0000, otherwise
+--		deferred
+--		end
 
 feature -- Access
 
@@ -188,10 +211,8 @@ feature -- Status report
 			-- Yes if don't have full permissions with "sudo", in
 			-- which case only the GPIO pin functions work
 
-	is_test_mode: BOOLEAN
-			-- Is the programming running in test mode?
-			-- Yes when not running on a Pi.  This allows some
-			-- functions to be simulated
+	is_peripheral_initialization_failed: BOOLEAN
+			-- Did `initialize_periferals' complete withoug errors?
 
 feature -- Basic operations
 
@@ -206,7 +227,16 @@ feature -- Basic operations
 --			end
 		end
 
-feature {NONE} -- Implementation (pin mapping)
+feature {NONE} -- Implementation
+
+	page_size: NATURAL_32
+			-- The size of a memory page in bytes, used to ensure
+			-- offsets align on page boundaries.
+		once
+			Result := c_page_size
+		end
+
+feature {NONE} -- Implementation
 
 --	header: PI_HEADER_MAP
 			-- Mapping from a {GPIO_PIN} (i.e. BCM or Broadcom
@@ -226,31 +256,7 @@ feature {NONE} -- Implementation (pin mapping)
 			-- Implementation of `pwm'; Void when `is_degraded_mode'
 			-- (Happens if not running with full permissions as "sudo")
 
-	peripheral_base_address: NATURAL_32
-			-- Physical address of the first peripheral register
-			-- Specific for this model.
-		deferred
-		end
---		do
---			Result := c_get_host_address
---		end
-
-	gpio_offset: NATURAL_32
-			-- Offset from `peripheral_base_address' to GPIO registers.
-		deferred
-		end
-
-	gpio_clocks_offset: NATURAL_32
-			-- Offset from `peripheral_base_address' to GPIO clock registers.
-		deferred
-		end
-
-	pwm_offset: NATURAL_32
-			-- Offsett from `peripheral_ase_address' to the PWM registers.
-		deferred
-		end
-
-	block_size: INTEGER_32 = 4096
+--	block_size: INTEGER_32 = 4096
 			-- Passed to `c_mmap'.  Same as used by WiringPi.
 
 	gpio_map_length: INTEGER_32 = 4096
@@ -279,6 +285,19 @@ feature {NONE} -- Externals
 			]"
 		end
 
+	c_page_size: NATURAL_32
+			-- The size of a page in bytes, used to ensure offsets align
+			-- on page boundaries.
+		external
+			"C inline use <unistd.h>"
+		alias
+			"[
+				int flags = _SC_PAGE_SIZE;
+				int r = sysconf (flags);
+				return (EIF_NATURAL) (r);
+			]"
+		end
+
 --	c_get_host_address: NATURAL_32
 --			-- Call `bcm_host_get_peripheral_address()' function
 --		external
@@ -292,9 +311,14 @@ feature {NONE} -- Externals
 
 invariant
 
-	test_mode_implication: is_test_mode implies not is_degraded_mode
-	degraded_mode_implication: is_degraded_mode implies not is_test_mode
+	is_gpio_clocks_offset_on_page_boundary: gpio_clocks_offset \\ page_size = 0
+	is_gpio_offset_on_page_boundary: gpio_offset \\ page_size = 0
+--	is_pcm_offset_on_page_boundary: pcm_offset \\ page_size = 0
+--	is_bcs_offset_on_page_boundary: bcs_offset \\ page_size = 0
+	is_pwm_offset_on_page_boundary: pwm_offset \\ page_size = 0
+--	is_uart_offset_on_page_boundary: uart_offset \\ page_size = 0
+--	is_dma_offset_on_page_boundary: dma_offset \\ page_size = 0
+--	is_interupts_offset_on_page_boundary: interupts_offset \\ page_size = 0
 
---	valid_model: model >= 0 and model <= 19
 
 end

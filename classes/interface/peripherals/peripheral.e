@@ -33,6 +33,7 @@ feature {NONE} -- Initialization
 				not_mmap_failed: not c_mmap_failed (base_address)
 					-- because the file should have been opened
 			end
+--			create registers_imp.make
 		end
 
 	dispose
@@ -46,6 +47,17 @@ feature {NONE} -- Initialization
 		end
 
 feature {NONE} -- Implementation
+
+--	registers: LINEAR [REGISTER]
+--			-- A non-editable list of registers used by this peripheral
+--		do
+--			Result := registers_imp.linear_representation
+--		end
+
+feature {NONE} -- Implementation
+
+--	registers_imp: LINKED_LIST [REGISTER]
+			-- List of registers belonging to Current
 
 	base_address: POINTER
 			-- Mapped address of this peripheral.
@@ -172,16 +184,16 @@ feature {NONE} -- Externals
 			"C inline use <sys/mman.h> "
 		alias
 			"[
-//				printf ("c_mmap \n");
-//				printf ("   a_fd = %d, a_length = %d, a_offset = %d \n",
-//							$a_fd, $a_length, $a_offset);
+				printf ("c_mmap \n");
+				printf ("   a_fd = %d, a_length = %d, a_offset = %d \n",
+							$a_fd, $a_length, $a_offset);
 				unsigned int* p;
 				p = (uint32_t *)mmap(0, $a_length, PROT_READ|PROT_WRITE, MAP_SHARED, $a_fd, $a_offset);
 					// could possibly be MAP_FAILED
 				if (p == MAP_FAILED) {
 					printf ("   c_mmap  MAP_FAILED \n");
  				}
-//				printf ("  value in p = %p     address = %p  \n", &p, p);
+				printf ("  value in p = %p     address = %p  \n", &p, p);
 					// Return the value referenced by `p'
 				return (EIF_POINTER) (p);
 			]"

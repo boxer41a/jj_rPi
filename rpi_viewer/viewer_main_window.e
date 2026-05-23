@@ -1,6 +1,6 @@
 note
 	description: "[
-		Main window for the {PI_VIEWER_APPLICATION}
+		Main window for the {RPI_VIEWER}
 		]"
 	author: "Jimmy J. Johnson"
 	date: "4/20/26"
@@ -35,7 +35,7 @@ feature {NONE} -- Initialization
 		do
 			Precursor {JJ_MAIN_WINDOW}
 			create command_tool_bar
-			create pi_tool
+			create rpi_tool
 --			create {PI_4_CONTROLLER} target_imp
 		end
 
@@ -44,9 +44,10 @@ feature {NONE} -- Initialization
 		do
 			build_commands_tool_bar
 			Precursor {JJ_MAIN_WINDOW}
-			split_manager.enable_mode_changes
+			split_manager.disable_mode_changes
 			split_manager.set_vertical
-			split_manager.extend (pi_tool)
+			split_manager.extend (rpi_tool)
+--			split_manager.exend (
 --			set_target (target)
 			set_size (800, 1000)
 			set_position (600, 100)
@@ -76,16 +77,20 @@ feature -- Element change
 			-- Change the target
 		do
 			Precursor {JJ_MAIN_WINDOW} (a_target)
-			pi_tool.set_target (a_target)
+			rpi_tool.set_target (a_target)
 		end
 
 feature -- Basic operations
 
 	draw
-			--
+			-- Draw the window
+		local
+			s: STRING
 		do
 			Precursor {JJ_MAIN_WINDOW}
 			paint_buttons
+			s := "RPI_VIEWER:  Model  " + target.model_string + "      " + target.processor.generating_type.name
+			set_title (s)
 		end
 
 feature {NONE} -- Implementation (actions)
@@ -101,14 +106,13 @@ feature {NONE} -- Implementation
 
 feature {NONE} -- Implementation
 
-	pi_tool: PI_TOOL
-			-- Drawing will be done here.
-
+	rpi_tool: PERIPHERAL_TOOL
+			-- Tool in which peripheral information is displayed
 
 	command_tool_bar: EV_HORIZONTAL_BOX
 			-- Holds buttons for testing some features.
 
-	target_imp: detachable PI_4_CONTROLLER
+	target_imp: detachable RPI
 			-- Implementation of the `target'
 
 

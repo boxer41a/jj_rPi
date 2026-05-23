@@ -20,27 +20,15 @@ note
 class
 	REGISTER
 
---inherit {NONE}
-
---	SHARED
---		export
---			{NONE}
---				all
---			{ANY}
---				pi
---		undefine
---			is_equal
---		end
-
 create
 	make
 
 feature {NONE} -- Initialization
 
-	make (a_pointer: POINTER; a_name: like name)
+	make (a_address: POINTER; a_name: like name)
 			-- Set up the register
 		do
-			pointer := a_pointer
+			address := a_address
 				-- Use copy to avoid an accidental name change
 			name := a_name.twin
 		end
@@ -49,6 +37,9 @@ feature -- Access
 
 	name: STRING_8
 			-- A printable name for Current (e.g. GPFSEL0, GPLEV0, etc)
+
+	address: POINTER
+			-- The address Current represents
 
 	value: NATURAL_32
 			-- The 32-bit value referenced by Current
@@ -60,7 +51,7 @@ feature -- Access
 			is_readable: is_readable
 		do
 				-- Get the value out of the register
-			Result := c_register_value (pointer)
+			Result := c_register_value (address)
 				-- ...then ensure "don't-care" bits to zero
 --			Result := filtered (Result)
 			Result := Result.bit_and (reserved_mask.bit_not)
@@ -168,7 +159,7 @@ feature -- Element change
 				v := v.bit_and (password_mask.bit_not)
 				v := v.bit_or (password)
 			end
-			c_set_register_value (pointer, v)
+			c_set_register_value (address, v)
 		ensure
 --			value_was_set: filtered (value) = a_value
 		end
@@ -176,7 +167,7 @@ feature -- Element change
 	show
 			-- Display values
 		do
-			print ("{" + generating_type +"}.show:  " + name + " at " + pointer.out + "%N")
+			print ("{" + generating_type +"}.show:  " + name + " at " + address.out + "%N")
 			print ("     value = " + value.to_hex_string + "%N")
 			print ("     password_mask:   " + password_mask.to_hex_string + "%N")
 			print ("     reserved mask:   " + reserved_mask.to_hex_string + "%N")
@@ -194,11 +185,11 @@ feature -- Element change
 		local
 			v: NATURAL_32
 		do
-			v := c_register_value (pointer)
+			v := c_register_value (address)
 --			print ("{REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
 			v := v.bit_or (pin_mask (a_index))
 --			print ("    {REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
-			c_set_register_value (pointer, v)
+			c_set_register_value (address, v)
 --			print ("    {REGISTER}.set_bit:  value = " + value.to_hex_string + "%N")
 		end
 
@@ -211,9 +202,9 @@ feature -- Element change
 		local
 			v: NATURAL_32
 		do
-			v := c_register_value (pointer)
+			v := c_register_value (address)
 			v := v.bit_and (pin_mask (a_index).bit_not)
-			c_set_register_value (pointer, v)
+			c_set_register_value (address, v)
 		end
 
 	set_reserved_mask (a_mask: NATURAL_32)
@@ -374,7 +365,7 @@ feature -- Status
 						is_bit_write_only (a_index))
 		end
 
-	is_bit_readable (a_index: INTEGER_32): BOOLEAN
+	valueis_bit_readable (a_index: INTEGER_32): BOOLEAN
 			-- Is bit number `a_index' readable?
 		require
 			valid_index: a_index >= 0 and a_index < 32
@@ -548,9 +539,6 @@ feature {NONE} -- Implementation
 		end
 
 feature {NONE} -- Implementation
-
-	pointer: POINTER
-			-- The address Current represents
 
 	pin_mask (a_index: INTEGER_32): NATURAL_32
 			-- Bitmask used to isolate the value a single bit in a register
