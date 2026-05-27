@@ -4,23 +4,30 @@ note
 		for placement in an {JJ_MODEL_WORLD_GRID}.
 	]"
 	author: "Jimmy J. Johnson"
-	date: "10/25/20"
+	date: "5/24/26"
 
 class
 	REGISTER_ROW_VIEW
 
 inherit
 
-	JJ_MODEL_WORLD_VIEW
+	JJ_GRID_ROW
 		rename
 			target as register
 		redefine
 			create_interface_objects,
 			initialize,
---			set_target,
+			set_target,
 			draw,
 			target_imp
 		end
+
+create
+	default_create,
+	make
+
+--create {JJ_MODEL_WORLD_VIEW}
+--	list_make
 
 feature {NONE} -- Initialization
 
@@ -30,40 +37,88 @@ feature {NONE} -- Initialization
 			-- in order to adhere to void-safety due to the implementation
             -- bridge pattern.
 		do
-			Precursor {JJ_MODEL_WORLD_VIEW}
+			Precursor
+			create address_text
+			create name_text
+			create description_text
+			create value_text
 		end
 
 	initialize
 			-- Set up the tool
 		do
 			Precursor
---			disable_history
 		end
 
 feature -- Element change
 
---	set_target (a_target: like target)
---			-- Change the object dislpayed in this tool
---		local
---			p: RPI_PROCESSOR
---		do
---			Precursor (a_target)
---		end
+	set_target (a_target: like register)
+			-- Change the object dislpayed in this tool
+		local
+			i: INTEGER
+		do
+			Precursor (a_target)
+			check
+				is_in_grid: parent /= Void
+			end
+			if not is_items_added then
+				set_item (1, address_text)
+				set_item (2, name_text)
+				set_item (3, description_text)
+				set_item (4, value_text)
+					-- set margins
+				from i := 1
+				until i > count
+				loop
+					check attached {EV_GRID_LABEL_ITEM}  item (i) as it then
+						it.set_left_border (10)
+						it.set_right_border (10)
+						if i /= 3 then
+--							it.align_text_center
+						end
+					end
+					i := i + 1
+				end
+				is_items_added := true
+			end
+			draw
+		end
 
 feature -- Basic operations
 
 	draw
 			-- Build the view, displaying info about the `register'
+		local
+			r: like register
 		do
-
+			Precursor
+			r := register
+			address_text.set_text (register.address.out)
+			name_text.set_text (register.name)
+			description_text.set_text (register.description)
+			if register.is_readable then
+				value_text.set_text (register.value.to_binary_string)
+			end
 		end
 
 feature {NONE} -- Implementation
 
---	name_text: EV_MODEL_TEXT
---			-- To display the name of the register
+	is_items_added: BOOLEAN
+			-- Flag saying that Current contains the text fields.
+			-- Unable to add them until Current is in a grid, so add on first call
+			-- to draw and set this flag there.
 
---	value_text: EV_MODEL_TEXT
+	address_text: EV_GRID_LABEL_ITEM
+			-- T display the address of the register
+
+	name_text: EV_GRID_LABEL_ITEM
+			-- To display the name of the register
+
+	description_text: EV_GRID_LABEL_ITEM
+			-- To display the description of the register
+
+	value_text: EV_GRID_LABEL_ITEM
+			-- To display the value
 
 	target_imp: detachable REGISTER
 			-- Implementation of the `target' (i.e. the register)

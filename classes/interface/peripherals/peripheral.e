@@ -1,7 +1,7 @@
 note
 	description: "[
 		A {PERIPHERAL} (e.g. {GPIO}, {CLOCKS}, {PWM}, etc) in
-		a {PI_CONTROLLER}.
+		a {RPI_PROCESSOR}.
 	]"
 	author: "Jimmy J. Johnson"
 	date: "10/25/20"
@@ -33,7 +33,7 @@ feature {NONE} -- Initialization
 				not_mmap_failed: not c_mmap_failed (base_address)
 					-- because the file should have been opened
 			end
---			create registers_imp.make
+			create list_imp.make
 		end
 
 	dispose
@@ -46,17 +46,27 @@ feature {NONE} -- Initialization
 			end
 		end
 
+feature -- Access
+
+	registers: LINEAR [REGISTER]
+			-- A non-editable list of registers used by this peripheral
+		do
+			if list_imp.is_empty then
+				fill_register_list
+			end
+			Result := list_imp.linear_representation
+		end
+
 feature {NONE} -- Implementation
 
---	registers: LINEAR [REGISTER]
---			-- A non-editable list of registers used by this peripheral
---		do
---			Result := registers_imp.linear_representation
---		end
+	fill_register_list
+			-- Put registers into the list
+		do
+		ensure
+			not_empty: not list_imp.is_empty
+		end
 
-feature {NONE} -- Implementation
-
---	registers_imp: LINKED_LIST [REGISTER]
+	list_imp: LINKED_LIST [REGISTER]
 			-- List of registers belonging to Current
 
 	base_address: POINTER

@@ -17,6 +17,7 @@ inherit
 			create_interface_objects,
 			initialize,
 			set_target,
+			draw,
 			target_imp
 		end
 
@@ -48,8 +49,18 @@ feature -- Element change
 			-- Change the object dislpayed in this tool
 		do
 			Precursor (a_target)
+			registers_view.set_target (gpio)
 --			rpi_view.set_target (a_target)
 --			processor_view.set_target (a_target.processor)
+		end
+
+feature -- Basic operations
+
+	draw
+			-- Redraw the view
+		do
+			Precursor
+			registers_view.draw
 		end
 
 feature {NONE} -- Implementation

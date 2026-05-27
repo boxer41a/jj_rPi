@@ -29,10 +29,10 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_address: POINTER; a_name: like name)
+	make (a_address: POINTER; a_name: like name; a_description: like description)
 			-- Create an instance
 		do
-			Precursor {REGISTER} (a_address, a_name)
+			Precursor {REGISTER} (a_address, a_name, a_description)
 			require_password
 			set_reserved_mask (0x00FFF840)	-- (11..23 & 6)
 			set_write_only_mask (password_mask)

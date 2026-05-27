@@ -11,7 +11,7 @@ class
 
 inherit
 
-	JJ_MODEL_WORLD_CELL_VIEW
+	JJ_GRID_VIEW
 		rename
 			target as peripheral
 		redefine
@@ -19,7 +19,8 @@ inherit
 			initialize,
 			set_target,
 			draw,
-			target_imp
+			target_imp,
+			row_type
 		end
 
 create
@@ -43,7 +44,13 @@ feature {NONE} -- Initialization
 			f: EV_FONT
 		do
 			Precursor
---			world.extend (grid.world)
+			enable_tree
+			set_column_count_to (4)
+			set_row_count_to (0)
+			column (1).set_title ("Address")
+			column (2).set_title ("Name")
+			column (3).set_title ("Description")
+			column (4).set_title ("Value")
 		end
 
 feature -- Element change
@@ -52,33 +59,93 @@ feature -- Element change
 			-- Change the target (i.e. the `peripheral') whose registers
 			-- are displayed by Current
 		do
-			fill_grid
 			Precursor (a_target)
+			build_rows
+			draw
 		end
 
 feature -- Basic operations
 
 	draw
-			-- Show information about the `target' (i.e. the RPI)
+			-- Show information about the `target' (i.e. the `register')
 		local
-			s: STRING
+			i: INTEGER
+			list: LINEAR [REGISTER]
+			r: REGISTER
 		do
-				-- Build the table
+			print (generating_type.name_32.out + ":  draw %N")
+			Precursor {JJ_GRID_VIEW}
+			if row_count > 0 then
+					-- Rows have been added
+				list := peripheral.registers
+				from
+					i := 1
+					list.start
+				until list.after
+				loop
+					r := list.item_for_iteration
+					check attached {REGISTER_ROW_VIEW} row (i) as rrv then
+						rrv.set_target (r)
+						if attached {RESERVED_REGISTER} r then
+							rrv.set_background_color (create {EV_COLOR}.make_with_rgb (0.95, 0.95, 0.95))
+						end
+	--					rrv.set_item (1, create {EV_GRID_LABEL_ITEM}.make_with_text (r.address.out))
+	--					rrv.set_item (2, create {EV_GRID_LABEL_ITEM}.make_with_text (r.name))
+	--					rrv.set_item (4, create {EV_GRID_LABEL_ITEM}.make_with_text (r.value.to_binary_string))
+					end
+					i := i + 1
+					list.forth
+				end
+				from i := 1
+				until i > column_count
+				loop
+					column (i).resize_to_content
+					i := i + 1
+				end
+			end
 
 		end
 
 feature {NONE} -- Implementation
 
---	grid: JJ_MODEL_WORLD_GRID
-			-- Grid/table which displays the registers
-
-	fill_grid
-			--	Add register rows to the `grid'
+	build_rows
+			--	Put info into the rows of the grid
+		local
+			i: INTEGER
+			list: LINEAR [REGISTER]
 		do
+				-- Add a row for each register
+			list := peripheral.registers
+			from
+				i := 1
+				list.start
+			until list.after
+			loop
+				if i > row_count then
+					insert_new_row (i)
+				end
+				i := i + 1
+				list.forth
+			end
+
+--			row (1).insert_subrow (1)
 		end
 
 	target_imp: detachable PERIPHERAL
 			-- Implementation of the `target'
+
+feature {NONE} -- Implementation
+
+	row_type: REGISTER_ROW_VIEW		--JJ_GRID_ROW	--  EV_GRID_ROW
+			-- Type used for row objects.
+			-- May be redefined by EV_GRID descendents.
+		require else
+			callable: False
+		do
+			check
+				do_not_call: False then
+			end
+		end
 
 end
 

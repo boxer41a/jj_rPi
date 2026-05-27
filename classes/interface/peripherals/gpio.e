@@ -15,7 +15,8 @@ inherit
 
 	PERIPHERAL
 		redefine
-			make
+			make,
+			fill_register_list
 		end
 
 create
@@ -30,46 +31,58 @@ feature {NONE}-- Initialization
 				-- Precursor sets the `base_address'
 			Precursor {PERIPHERAL} (a_file_descriptor, a_length, a_address)
 				-- GPFSELx registers
-			create gpfsel_0.make (base_address + 0x00, "GPFSEL0")
-			create gpfsel_1.make (base_address + 0x04, "GPFSEL1")
-			create gpfsel_2.make (base_address + 0x08, "GPFSEL2")
-			create gpfsel_3.make (base_address + 0x0C, "GPFSEL3")
-			create gpfsel_4.make (base_address + 0x10, "GPFSEL4")
-			create gpfsel_5.make (base_address + 0x14, "GPFSEL5")
+			create gpfsel_0.make (base_address + 0x00, "GPFSEL0", "GPIO Function Select 0")
+			create gpfsel_1.make (base_address + 0x04, "GPFSEL1", "GPIO Function Select 1")
+			create gpfsel_2.make (base_address + 0x08, "GPFSEL2", "GPIO Function Select 2")
+			create gpfsel_3.make (base_address + 0x0C, "GPFSEL3", "GPIO Function Select 3")
+			create gpfsel_4.make (base_address + 0x10, "GPFSEL4", "GPIO Function Select 4")
+			create gpfsel_5.make (base_address + 0x14, "GPFSEL5", "GPIO Function Select 6")
 				-- reserved  0x18
-			create gpset_0.make (base_address + 0x1C, "GPSET0")
-			create gpset_1.make (base_address + 0x20, "GPSET1")
+			create reserved_0x18.make (base_address + 0x18, "-", "Reserved")
+			create gpset_0.make (base_address + 0x1C, "GPSET0", "GPIO Pin Output Set 0")
+			create gpset_1.make (base_address + 0x20, "GPSET1", "GPIO Pin Output Set 1")
 				-- reserved  0x24
-			create gpclr_0.make (base_address + 0x28, "GPCLR0")
-			create gpclr_1.make (base_address + 0x2C, "GPCLR1")
+			create reserved_0x24.make (base_address + 0x24, "-", "Reserved")
+			create gpclr_0.make (base_address + 0x28, "GPCLR0", "GPIO Pin Output Clear 0")
+			create gpclr_1.make (base_address + 0x2C, "GPCLR1", "GPIO Pin Output Clear 1")
 				-- reserved  0x30
-			create gplev_0.make (base_address + 0x34, "GP_LEV0")
-			create gplev_1.make (base_address + 0x38, "GP_LEV1")
+			create reserved_0x30.make (base_address + 030, "-", "Reserved")
+			create gplev_0.make (base_address + 0x34, "GP_LEV0", "GPIO Pin Level 0")
+			create gplev_1.make (base_address + 0x38, "GP_LEV1", "GPIO Pin Level 1")
 				-- reserved  0x3C
-			create gpeds_0.make (base_address + 0x40, "GPEDS0")
-			create gpeds_1.make (base_address + 0x44, "GPEDS1")
+			create reserved_0x3c.make (base_address + 0x3C, "-", "Reserved")
+			create gpeds_0.make (base_address + 0x40, "GPEDS0", "GPIO Pin Event Detec Status 0")
+			create gpeds_1.make (base_address + 0x44, "GPEDS1", "GPIO Pin Event Detec Status 1")
 				-- reserved  0x48
-			create gpren_0.make (base_address + 0x4C, "GPREN0")
-			create gpren_1.make ( base_address + 0x50, "GPREN1")
+			create reserved_0x48.make (base_address + 0x48, "-", "Reserved")
+			create gpren_0.make (base_address + 0x4C, "GPREN0", "GPIO Pin Rising Edge Detect Enable 0")
+			create gpren_1.make ( base_address + 0x50, "GPREN1", "GPIO Pin Rising Edge Detect Enable 1")
 				-- reserved  0x54
-			create gpfen_0.make (base_address + 0x58, "GPFEN0")
-			create gpfen_1.make (base_address + 0x5C, "GPFEN1")
+			create reserved_0x54.make (base_address + 0x54, "-", "Reserved")
+			create gpfen_0.make (base_address + 0x58, "GPFEN0", "GPIO Pin Falling Edge Detect Enable 0")
+			create gpfen_1.make (base_address + 0x5C, "GPFEN1", "GPIO Pin Falling Edge Detect Enable 1")
 				-- reserved  0x60
-			create gphen_0.make (base_address + 0x64, "GPHEN0")
-			create gphen_1.make (base_address + 0x68, "GPHEN1")
+			create reserved_0x60.make (base_address + 0x60, "-", "Reserved")
+			create gphen_0.make (base_address + 0x64, "GPHEN0", "GPIO Pin High Detect Enable 0")
+			create gphen_1.make (base_address + 0x68, "GPHEN1", "GPIO Pin High Detect Enable1")
 				-- reserved  0x6C
-			create gplen_0.make (base_address + 0x70, "GPLEN0")
-			create gplen_1.make (base_address + 0x74, "GPLEN1")
+			create reserved_0x6c.make (base_address + 0x6C, "-", "Reserved")
+			create gplen_0.make (base_address + 0x70, "GPLEN0", "GPIO Pin Low Detect Enable 0")
+			create gplen_1.make (base_address + 0x74, "GPLEN1", "GPIO Pin Low Detect Enable 0")
 				-- reserved  0x78
-			create gparen_0.make (base_address + 0x7C, "GPAREN0")
-			create gparen_1.make (base_address + 0x80, "GPAREN1")
+			create reserved_0x78.make (base_address + 0x78, "-", "Reserved")
+			create gparen_0.make (base_address + 0x7C, "GPAREN0", "GPIO Pin Async. Rising Edge Detect 0")
+			create gparen_1.make (base_address + 0x80, "GPAREN1", "GPIO Pin Async. Rising Edge Detect 1")
 				-- reserved  0x84			
-			create gpafen_0.make (base_address + 0x88, "GPAFEN0")
-			create gpafen_1.make (base_address + 0x8C, "GPAFEN1")
-			create gpio_pup_pdn_cntrl_reg0.make (base_address + 0xE4, "GPIO_PUP_PDN_CNTRL_REG0")
-			create gpio_pup_pdn_cntrl_reg1.make (base_address + 0xE8, "GPIO_PUP_PDN_CNTRL_REG1")
-			create gpio_pup_pdn_cntrl_reg2.make (base_address + 0xEC, "GPIO_PUP_PDN_CNTRL_REG2")
-			create gpio_pup_pdn_cntrl_reg3.make (base_address + 0xF0, "GPIO_PUP_PDN_CNTRL_REG3")
+			create reserved_0x84.make (base_address + 0x84, "-", "Reserved")
+			create gpafen_0.make (base_address + 0x88, "GPAFEN0", "GPIO Pin Async. Falling Edge Detect 0")
+			create gpafen_1.make (base_address + 0x8C, "GPAFEN1", "GPIO Pin Async. Falling Edge Detect 0")
+				-- reserved  0x90		
+			create reserved_0x90.make (base_address + 0x90, "-", "Reserved")
+			create gpio_pup_pdn_cntrl_reg0.make (base_address + 0xE4, "GPIO_PUP_PDN_CNTRL_REG0", "GPIO Pull-up / Pull-down Register 0")
+			create gpio_pup_pdn_cntrl_reg1.make (base_address + 0xE8, "GPIO_PUP_PDN_CNTRL_REG1", "GPIO Pull-up / Pull-down Register 1")
+			create gpio_pup_pdn_cntrl_reg2.make (base_address + 0xEC, "GPIO_PUP_PDN_CNTRL_REG2", "GPIO Pull-up / Pull-down Register 2")
+			create gpio_pup_pdn_cntrl_reg3.make (base_address + 0xF0, "GPIO_PUP_PDN_CNTRL_REG3", "GPIO Pull-up / Pull-down Register 3")
 				-- GPFSEL0 to GPFSEL5
 			gpfsel_0.set_reserved_mask (0xC0000000)
 			gpfsel_1.set_reserved_mask (0xC0000000)
@@ -559,7 +572,7 @@ feature {NONE} -- Implementation
 					should_not_happen: false
 						-- because there are only 58 gpio pins
 				end
-				create Result.make (base_address, "Error")
+				create Result.make (base_address, "Error", "Should not happen")
 			end
 		end
 
@@ -757,6 +770,53 @@ feature {NONE} -- Implementation
 		end
 
 feature {NONE} -- Implementation
+
+	fill_register_list
+			-- Put the registers into the `registers'
+		do
+			list_imp.extend (gpfsel_0)
+			list_imp.extend (gpfsel_1)
+			list_imp.extend (gpfsel_2)
+			list_imp.extend (gpfsel_3)
+			list_imp.extend (gpfsel_4)
+			list_imp.extend (gpfsel_5)
+			list_imp.extend (reserved_0x18)
+			list_imp.extend (gpset_0)
+			list_imp.extend (gpset_1)
+			list_imp.extend (reserved_0x24)
+			list_imp.extend (gpclr_0)
+			list_imp.extend (gpclr_1)
+			list_imp.extend (reserved_0x30)
+			list_imp.extend (gplev_0)
+			list_imp.extend (gplev_1)
+			list_imp.extend (reserved_0x3c)
+			list_imp.extend (gpeds_0)
+			list_imp.extend (gpeds_1)
+			list_imp.extend (reserved_0x48)
+			list_imp.extend (gpren_0)
+			list_imp.extend (gpren_1)
+			list_imp.extend (reserved_0x54)
+			list_imp.extend (gpfen_0)
+			list_imp.extend (gpfen_1)
+			list_imp.extend (reserved_0x60)
+			list_imp.extend (gphen_0)
+			list_imp.extend (gphen_1)
+			list_imp.extend (reserved_0x6c)
+			list_imp.extend (gplen_0)
+			list_imp.extend (gplen_1)
+			list_imp.extend (reserved_0x78)
+			list_imp.extend (gparen_0)
+			list_imp.extend (gparen_1)
+			list_imp.extend (reserved_0x84)
+			list_imp.extend (gpafen_0)
+			list_imp.extend (gpafen_1)
+			list_imp.extend (reserved_0x90)
+			list_imp.extend (gpio_pup_pdn_cntrl_reg0)
+			list_imp.extend (gpio_pup_pdn_cntrl_reg1)
+			list_imp.extend (gpio_pup_pdn_cntrl_reg2)
+			list_imp.extend (gpio_pup_pdn_cntrl_reg3)
+		end
+
 feature -- for testing
 
 	gpfsel_0: FUNCTION_SELECT_REGISTER
@@ -783,17 +843,26 @@ feature -- for testing
 			-- The "GPFSEL5" register.
 			-- See "BCM2711 ARM Peripherals", page 83.
 
+	reserved_0x18: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
+
 	gpset_0: REGISTER
 			-- Used to set a GPIO pin (0..31)
 
 	gpset_1: REGISTER
 			-- Used to set a GPIO pin (32..gpio pin count)
 
+	reserved_0x24: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
+
 	gpclr_0: REGISTER
 			-- Used to clear a GPIO pin (0..31)
 
 	gpclr_1: REGISTER
 			-- Used to clear a GPIO pin (32..gpio pin count)
+
+	reserved_0x30: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
 
 	gplev_0: REGISTER
 			-- Used to return the level of a GPIO pin (0..31)
@@ -802,6 +871,9 @@ feature -- for testing
 	gplev_1: REGISTER
 			-- Used to return the level of a GPIO pin (32..max)
 			-- Either low or high
+
+	reserved_0x3c: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
 
 	gpeds_0: REGISTER
 			-- GPIO Pin Event Detect Status 0 (for GPIO pins 0..31).
@@ -816,6 +888,9 @@ feature -- for testing
 			-- GPIO Pin Event Detect Status 1 (for GPIO pins 0..31).
 			-- See `gpeds_0'
 
+	reserved_0x48: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
+
 	gpren_0: REGISTER
 			-- GPIO Pin Rising Edge Detect Enable 0 (pins 0..31).
 			-- Defines the pins for which a rising edge transition sets a bit in
@@ -827,6 +902,9 @@ feature -- for testing
 	gpren_1: REGISTER
 			-- GPIO Pin Rising Edge Detect Enable 1 (pins 32..max).
 			-- See `gpren_0'.
+
+	reserved_0x54: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
 
 	gpfen_0: REGISTER
 			-- GPIO Pin Falling Edge Detect Enable 0 (pins 0..31).
@@ -840,6 +918,9 @@ feature -- for testing
 			-- GPIO Pin Falling Edge Detect Enable 1 (pins 32..max).
 			-- See `gpfen_0'.
 
+	reserved_0x60: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
+
 	gphen_0: REGISTER
 			-- GPIO Pin High Detect Enable 0 (pins 0..31).
 			-- Defines the pins for which a high level sets a bit in the Event Detect
@@ -850,6 +931,9 @@ feature -- for testing
 	gphen_1: REGISTER
 			-- GPIO Pin High Detect Enable 1 (pins 32..max).
 			-- See `gphen_0'.
+
+	reserved_0x6c: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
 
 	gplen_0: REGISTER
 			-- GPIO Pin Low Detect Enable 0 (pins 0..31).
@@ -862,6 +946,9 @@ feature -- for testing
 			-- GPIO Pin Low Detect Enable 1 (pins 32..max).
 			-- See `gplen_0'.
 
+	reserved_0x78: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
+
 	gparen_0: REGISTER
 			-- GPIO Pin Asyncronous Rising Edge Detect 0 (pins 0..31).
 			-- Define the pins for which an asynchronous rising edge transition sets
@@ -873,6 +960,9 @@ feature -- for testing
 			-- GPIO Pin Asyncronous Rising Edge Detect 1 (pins 32..max).
 			-- See `gparen_0'.
 
+	reserved_0x84: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
+
 	gpafen_0: REGISTER
 			-- GPIO Pin Asyncronous Falling Edge Detect 0 (pins 0..31).
 			-- Define the pins for which an asynchronous falling edge transition sets
@@ -882,6 +972,9 @@ feature -- for testing
 
 	gpafen_1: REGISTER
 			-- GPIO Pin Asyncronous Falling Edge Detect 1 (pins 32..max).
+
+	reserved_0x90: RESERVED_REGISTER
+			-- Register reserved (see BCM2711 Peripherals.pdf)
 
 	gpio_pup_pdn_cntrl_reg0: PULL_UP_DOWN_REGISTER
 			-- Controls the actuation of the internal pull-up/down resistors for

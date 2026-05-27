@@ -11,8 +11,8 @@ note
 		whose return value is "don't care".
 
 		As of now, the "don't care" bits are returned (and checked) as zero,
-		but this may be a problem if in the future these bits become become
-		useful to a Raspberry Pi.
+		but this may be a problem if in the future these bits become useful
+		to a Raspberry Pi.
 		]"
 	author: "Jimmy J Johnson"
 	date: "10/11/20"
@@ -25,21 +25,25 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_address: POINTER; a_name: like name)
+	make (a_address: POINTER; a_name: like name; a_description: like description)
 			-- Set up the register
 		do
 			address := a_address
 				-- Use copy to avoid an accidental name change
 			name := a_name.twin
+			description := a_description.twin
 		end
 
 feature -- Access
 
+	address: POINTER
+			-- The address Current represents
+
 	name: STRING_8
 			-- A printable name for Current (e.g. GPFSEL0, GPLEV0, etc)
 
-	address: POINTER
-			-- The address Current represents
+	description: STRING_8
+			-- A short description of this register's function
 
 	value: NATURAL_32
 			-- The 32-bit value referenced by Current
@@ -365,7 +369,7 @@ feature -- Status
 						is_bit_write_only (a_index))
 		end
 
-	valueis_bit_readable (a_index: INTEGER_32): BOOLEAN
+	is_bit_readable (a_index: INTEGER_32): BOOLEAN
 			-- Is bit number `a_index' readable?
 		require
 			valid_index: a_index >= 0 and a_index < 32

@@ -61,8 +61,8 @@ feature {NONE} -- Initialization
 		local
 			s: STRING_8
 		do
-			create controller.make (a_address, "CM_CTL")
-			create divisor.make (a_address + 0x04,"CM_DIV")
+			create controller.make (a_address, "CM_CTL", "Clock Manager General Purpose Clocks Control")
+			create divisor.make (a_address + 0x04,"CM_DIV", "Clock Manager General Purpose Clocks Divisors")
 		end
 
 feature -- Access

@@ -47,15 +47,26 @@ feature -- Element change
 			-- Change the object dislpayed in this tool
 		local
 			p: RPI_PROCESSOR
+			env: EV_ENVIRONMENT
 		do
 			Precursor (a_target)
 			p := target.processor
 			gpio_tool.set_target (p.gpio)
 			clocks_tool.set_target (p.clocks)
 			pwm_tool.set_target (p.pwm)
+			if not has_idle_actions then
+				create env
+				check attached env.application as a then
+					a.add_idle_action (agent gpio_tool.draw)
+				end
+				has_idle_actions := True
+			end
 		end
 
 feature {NONE} -- Implementation
+
+	has_idle_actions: BOOLEAN
+			-- Have actions to be performed on idle been added to Current?
 
 	gpio_tool: GPIO_TOOL
 			-- Shows info about the RPI's `gpio' peripheral

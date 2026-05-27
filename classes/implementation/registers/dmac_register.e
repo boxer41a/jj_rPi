@@ -23,10 +23,10 @@ create
 
 feature {NONE} -- Implementation
 
-	make (a_address: POINTER; a_name: like name)
+	make (a_address: POINTER; a_name: like name; a_description: like description)
 			-- Set up the register
 		do
-			Precursor {REGISTER} (a_address, a_name)
+			Precursor {REGISTER} (a_address, a_name, a_description)
 			reset_panic_threshold
 			reset_dreq_threshold
 		ensure then
