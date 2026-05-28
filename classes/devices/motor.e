@@ -68,7 +68,7 @@ feature {NONE} -- Implementation
 			pin_2.set_mode ({GPIO_PIN_CONSTANTS}.output)
 		ensure then
 			default_pwm_pin: pwm_pin.number = 18
-			default_pin_1: pin_1.number = 21
+			default_pin_1: pin_1.number = 12
 			default_pin_2: pin_2.number = 17
 			is_set: is_connected
 		end

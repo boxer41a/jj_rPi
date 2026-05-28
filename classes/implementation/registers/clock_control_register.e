@@ -105,7 +105,7 @@ feature -- Status setting
 			v := v.bit_or (enable_mask)		-- set bit 4
 			set_value (v)
 				-- Wait for the busy bit to actually become set
-			wait (100, agent is_busy)
+			wait (Default_wait, agent is_busy)
 		ensure
 			is_enabled: is_enabled
 			is_running: is_busy
@@ -128,7 +128,7 @@ feature -- Status setting
 			v := v.bit_and (enable_mask.bit_not)		-- clears bit 4
 			set_value (v)
 				-- Wait for the busy bit to actually clear
-			wait (100, agent is_busy)
+			wait (Default_wait, agent is_busy)
 		ensure
 			not_enabled: not is_enabled
 			not_running: not is_busy
@@ -228,6 +228,9 @@ feature {NONE} -- Implementation
 		end
 
 feature {NONE} -- Implementation
+	
+	Default_wait: NATURAL_32 = 100
+			-- Default time passed to `wait' in microseconds
 
 	mash_mask: NATURAL_32 = 0x00000600
 			-- `bit_and' with `value' to return the "MASH" bits (9..10)
