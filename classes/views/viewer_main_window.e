@@ -89,11 +89,14 @@ feature -- Basic operations
 		do
 			Precursor {JJ_MAIN_WINDOW}
 			paint_buttons
-			s := "RPI_VIEWER:  Model  " + target.model_string + "      " + target.processor.generating_type.name
+			s := "RPI_VIEWER:  Model  "
+			s := s + target.model_string + "   "
+			s := s + target.processor.generating_type.name
+--			s := s + create {STRING} .make_from_separate (target.model_string) + "     "
+--			s := s + create {STRING} .make_from_separate (target.processor.generating_type.name)
 			set_title (s)
 		end
 
-feature {NONE} -- Implementation (actions)
 
 
 feature {NONE} -- Implementation
@@ -114,6 +117,5 @@ feature {NONE} -- Implementation
 
 	target_imp: detachable RPI
 			-- Implementation of the `target'
-
 
 end

@@ -176,7 +176,7 @@ feature -- Access
 			Result := pins.i_th (pins.count)  -- last {GPIO_PIN} on 40-pin header
 		end
 
-	gpio: GPIO
+	gpio: attached like gpio_imp
 			-- {PERIPHERAL} giving access to the GPIO pins
 		do
 			check attached gpio_imp as g then
@@ -184,7 +184,7 @@ feature -- Access
 			end
 		end
 
-	clocks: CLOCKS
+	clocks: attached like clocks_imp
 			-- {PERIPHERAL} giving access to the clocks
 		require
 			not_is_degraded_mode: not is_degraded_mode
@@ -194,7 +194,7 @@ feature -- Access
 			end
 		end
 
-	pwm: PWM
+	pwm: attached like pwm_imp
 			-- {PERIPHERAL} giving access to the PWM controllers
 		require
 			not_is_degraded_mode: not is_degraded_mode
@@ -245,14 +245,14 @@ feature {NONE} -- Implementation
 	pins: ARRAYED_SET [GPIO_PIN]
 			-- List of pins in this RPi
 
-	gpio_imp: detachable like gpio
+	gpio_imp: detachable GPIO
 			-- Implementation of `gpio'
 
-	clocks_imp: detachable like clocks
+	clocks_imp: detachable CLOCKS
 			-- Implementation of `clocks'; Void when `is_degraded_mode'.
 			-- (Happens if not running with full permissions with "sudo")
 
-	pwm_imp: detachable like pwm
+	pwm_imp: detachable PWM
 			-- Implementation of `pwm'; Void when `is_degraded_mode'
 			-- (Happens if not running with full permissions as "sudo")
 

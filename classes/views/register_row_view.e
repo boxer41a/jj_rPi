@@ -88,16 +88,13 @@ feature -- Basic operations
 
 	draw
 			-- Build the view, displaying info about the `register'
-		local
-			r: like register
 		do
 			Precursor
-			r := register
 			address_text.set_text (register.address.out)
-			name_text.set_text (register.name)
-			description_text.set_text (register.description)
+			name_text.set_text (create {STRING}.make_from_separate (register.name))
+			description_text.set_text (create {STRING}.make_from_separate (register.description))
 			if register.is_readable then
-				value_text.set_text (register.value.to_binary_string)
+				value_text.set_text (create {STRING}.make_from_separate (register.value.to_binary_string))
 			end
 		end
 

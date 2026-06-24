@@ -40,7 +40,7 @@ feature {NONE} -- Initialization
 			Precursor
 			disable_history
 			split_manager.extend (registers_view)
-			split_manager.extend (temp_view)
+--			split_manager.extend (temp_view)
 		end
 
 feature -- Element change

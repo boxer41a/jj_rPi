@@ -70,20 +70,20 @@ feature -- Basic operations
 			-- Show information about the `target' (i.e. the `register')
 		local
 			i: INTEGER
-			list: LINEAR [REGISTER]
+			r_list: LINEAR [REGISTER]
 			r: REGISTER
 		do
 			print (generating_type.name_32.out + ":  draw %N")
 			Precursor {JJ_GRID_VIEW}
 			if row_count > 0 then
 					-- Rows have been added
-				list := peripheral.registers
+				r_list := peripheral.registers
 				from
 					i := 1
-					list.start
-				until list.after
+					r_list.start
+				until r_list.after
 				loop
-					r := list.item_for_iteration
+					r := r_list.item_for_iteration
 					check attached {REGISTER_ROW_VIEW} row (i) as rrv then
 						rrv.set_target (r)
 						if attached {RESERVED_REGISTER} r then
@@ -94,16 +94,17 @@ feature -- Basic operations
 	--					rrv.set_item (4, create {EV_GRID_LABEL_ITEM}.make_with_text (r.value.to_binary_string))
 					end
 					i := i + 1
-					list.forth
+					r_list.forth
 				end
 				from i := 1
 				until i > column_count
 				loop
-					column (i).resize_to_content
+					if i /= 2 then
+						column (i).resize_to_content
+					end
 					i := i + 1
 				end
 			end
-
 		end
 
 feature {NONE} -- Implementation
@@ -112,23 +113,21 @@ feature {NONE} -- Implementation
 			--	Put info into the rows of the grid
 		local
 			i: INTEGER
-			list: LINEAR [REGISTER]
+			r_list: LINEAR [REGISTER]
 		do
 				-- Add a row for each register
-			list := peripheral.registers
+			r_list := peripheral.registers
 			from
 				i := 1
-				list.start
-			until list.after
+				r_list.start
+			until r_list.after
 			loop
 				if i > row_count then
 					insert_new_row (i)
 				end
 				i := i + 1
-				list.forth
+				r_list.forth
 			end
-
---			row (1).insert_subrow (1)
 		end
 
 	target_imp: detachable PERIPHERAL

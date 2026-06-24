@@ -37,8 +37,8 @@ feature {NONE} -- Initialization
 			Precursor
 --			disable_history
 			split_manager.extend (gpio_tool)
-			split_manager.extend (clocks_tool)
-			split_manager.extend (pwm_tool)
+--			split_manager.extend (clocks_tool)
+--			split_manager.extend (pwm_tool)
 		end
 
 feature -- Element change
@@ -46,9 +46,12 @@ feature -- Element change
 	set_target (a_target: like target)
 			-- Change the object dislpayed in this tool
 		local
-			p: RPI_PROCESSOR
 			env: EV_ENVIRONMENT
+			p, p2: RPI_PROCESSOR
 		do
+			if not is_view_empty then
+				p2 := target.processor
+			end
 			Precursor (a_target)
 			p := target.processor
 			gpio_tool.set_target (p.gpio)

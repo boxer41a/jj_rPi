@@ -545,7 +545,7 @@ feature {NONE} -- Implementation
 feature {NONE} -- Implementation
 
 	pin_mask (a_index: INTEGER_32): NATURAL_32
-			-- Bitmask used to isolate the value a single bit in a register
+			-- Bitmask used to isolate the value of a single bit in a register
 			-- (i.e. 32-bit number with a one in the `a_index' location
 			-- which can be bit-anded with a register to return only the
 			-- value of that pin)

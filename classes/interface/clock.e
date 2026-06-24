@@ -1,6 +1,6 @@
 note
 	description: "[
-		A General Purpose GPIO Clock, the PCM Clock or the PWM Clock
+		A General Purpose GPIO Clock, the PCM Clock, or the PWM Clock
 		in the {PI_CONTROLLER}.
 		See BCM2711 ARM Peripheral, page 102-105
 		See BCM2835 Audio & PWM Clocks, Feb 2013.
@@ -176,7 +176,6 @@ feature -- Access
 --			Result := divisor.value.bit_and (divf_mask)
 			Result := divisor.real_divisor
 		end
-
 
 feature -- Status report
 

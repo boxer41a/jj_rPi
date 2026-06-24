@@ -16,7 +16,10 @@ inherit
 		redefine
 			default_create,
 			initialize_peripherals,
-			expected_pin_count
+			expected_pin_count,
+			gpio_imp,
+			clocks_imp,
+			pwm_imp
 		end
 
 create
@@ -40,15 +43,19 @@ feature {NONE} -- Initialization
 		local
 			a: ANY
 			add: NATURAL_32
+			dir: STRING_8
+			ext: STRING_8
 		do
-			gpio_clocks_fd := memory_file_descriptor ("gpio_clocks")
-			gpio_fd := memory_file_descriptor ("gpio")
-			pcm_fd := memory_file_descriptor ("pcm")
-			bcs_fd := memory_file_descriptor ("bcs")
-			pwm_fd := memory_file_descriptor ("pwm")
-			uart_fd := memory_file_descriptor ("uart")
-			dma_fd := memory_file_descriptor ("dma")
-			interupts_fd := memory_file_descriptor ("interupts")
+			dir := ".data\simulated_memory_files\"
+			ext := ".sim"
+			gpio_clocks_fd := memory_file_descriptor (dir + "gpio_clocks" + ext)
+			gpio_fd := memory_file_descriptor (dir + "gpio" + ext)
+			pcm_fd := memory_file_descriptor (dir + "pcm" + ext)
+			bcs_fd := memory_file_descriptor (dir + "bcs" + ext)
+			pwm_fd := memory_file_descriptor (dir + "pwm" + ext)
+			uart_fd := memory_file_descriptor (dir + "uart" + ext)
+			dma_fd := memory_file_descriptor (dir + "dma" + ext)
+			interupts_fd := memory_file_descriptor (dir + "interupts" + ext)
 			add := peripheral_base_address
 				-- Create the peripherals
 			create gpio_imp.make (gpio_fd, gpio_map_length, add + gpio_offset)
@@ -276,6 +283,22 @@ feature -- Access
 			-- offset is 0x4_C004_0000.
 			-- Requires 124 bytes bytes
 
+feature {NONE} -- Implementation
+
+--	header: PI_HEADER_MAP
+			-- Mapping from a {GPIO_PIN} (i.e. BCM or Broadcom
+			-- numbering scheme) to the physical pin number.
+
+	gpio_imp: detachable SIMULATED_GPIO
+			-- Implementation of `gpio'
+
+	clocks_imp: detachable SIMULATED_CLOCKS
+			-- Implementation of `clocks'; Void when `is_degraded_mode'.
+			-- (Happens if not running with full permissions with "sudo")
+
+	pwm_imp: detachable PWM
+			-- Implementation of `pwm'; Void when `is_degraded_mode'
+			-- (Happens if not running with full permissions as "sudo")
 
 feature {NONE} -- Implementation
 

@@ -18,10 +18,16 @@ library_target="jj_rpi">
 		</option>
 		<setting name="dead_code_removal" value="feature"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<library name="vision2" location="$ISE_LIBRARY\library\vision2\vision2.ecf"/>
+		<library name="jj_vision" location ="$JJ_GITHUB\jj_vision\jj_vision.ecf"/>
+<!--
 		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf"/>
+-->
+
 		<cluster name="devices" location=".\classes\devices\" recursive="true"/>
 		<cluster name="implementation" location=".\classes\implementation\" recursive="true"/>
 		<cluster name="interface" location=".\classes\interface\" recursive="true"/>
+		<cluster name="views" location=".\classes\views\" recursive="true"/>
 	</target>
 
 	<target name="jj_rpi_tests" extends="jj_rpi">

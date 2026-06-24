@@ -295,45 +295,49 @@ feature -- Basic operations
 			mode_was_set: mode_on_pin (a_number) = a_mode
 		end
 
-
-	write_signal_on_pin (a_number: INTEGER_32; a_signal: NATURAL_32)
-			-- Send `a_signal' (high or low) to `a_number'.
-			-- (i.e. send a one or zero to that pin.)
+	set_pin (a_number: INTEGER_32)
+			-- Set the state of pin `a_number' to High.
+			-- Note:  use `clear_pin' to set the state to Low.
 		require
 			valid_pin_number: is_valid_pin_number (a_number)
-			is_output_mode: mode_on_pin (a_number) = {GPIO_PIN_CONSTANTS}.output
-			valid_signal: a_signal = {GPIO_PIN_CONSTANTS}.Low or a_signal = {GPIO_PIN_CONSTANTS}.High
+--			is_output_mode: mode_on_pin (a_number) = {GPIO_PIN_CONSTANTS}.output
 		local
 			reg: REGISTER
-			n: NATURAL_32
 		do
-			if a_signal = {GPIO_PIN_CONSTANTS}.Low then
-					-- Get the GPCLRx register associated with `a_number'
-				reg := gpclr_register (a_number)
-			else
-					-- Get the GPSETx register associated with `a_number'
-				reg := gpset_register (a_number)
-			end
-			if a_number = 10 then
-				do_nothing
-			end
+				-- Get the GPSETx register associated with `a_number'
+			reg := gpset_register (a_number)
 			reg.set_bit (a_number \\ 32)
-			if a_number = 10 then
-				n := read_signal_on_pin (a_number)
-			end
 		ensure
-			signal_was_written: read_signal_on_pin (a_number) = a_signal
+			valid_result: mode_on_pin (a_number) = {GPIO_PIN_CONSTANTS}.output implies
+									signal_on_pin (a_number) = {GPIO_PIN_CONSTANTS}.high
 		end
 
-	read_signal_on_pin (a_number: INTEGER_32): NATURAL_32
-			-- Get the value of the signal on `a_number'.
+	clear_pin (a_number: INTEGER_32)
+			-- Set the state of pin `a_number' to Low.
+			-- Note:  use `set_pin' to set the state to High.
+		require
+			valid_pin_number: is_valid_pin_number (a_number)
+--			is_output_mode: mode_on_pin (a_number) = {GPIO_PIN_CONSTANTS}.output
+		local
+			reg: REGISTER
+		do
+				-- Get the GPCLRx register associated with `a_number'
+			reg := gpclr_register (a_number)
+			reg.set_bit (a_number \\ 32)
+		ensure
+			valid_result: mode_on_pin (a_number) = {GPIO_PIN_CONSTANTS}.output implies
+									signal_on_pin (a_number) = {GPIO_PIN_CONSTANTS}.low
+		end
+
+	signal_on_pin (a_number: INTEGER_32): NATURAL_32
+			-- Get the value of the signal on pin `a_number'.
 			-- (i.e. get the one or zero for that pin from the GPLEVx register.)
 		require
 			valid_pin_number: is_valid_pin_number (a_number)
 		do
 			Result := gplev_register (a_number).bit_value (a_number \\ 32)
 		ensure
-			valid_result: Result = {GPIO_PIN_CONSTANTS}.Low or Result = {GPIO_PIN_CONSTANTS}.high
+			valid_result: Result = {GPIO_PIN_CONSTANTS}.Low or Result = {GPIO_PIN_CONSTANTS}.High
 		end
 
 	clear_detected_event_on_pin (a_number: INTEGER_32)

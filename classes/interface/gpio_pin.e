@@ -63,7 +63,7 @@ feature -- Access
 	state: NATURAL_32
 			-- The value on Current (High or Low)
 		do
-			Result := pi.gpio.read_signal_on_pin (number)
+			Result := pi.gpio.signal_on_pin (number)
 		ensure
 			valid_result: Result = {GPIO_PIN_CONSTANTS}.Low or Result = {GPIO_PIN_CONSTANTS}.High
 		end
@@ -131,27 +131,42 @@ feature -- Element change
 			mode_was_set: mode = a_mode
 		end
 
-	set_state (a_signal: NATURAL_32)
-			-- Set `state' to `a_signal' (high or low).
-			-- (i.e. send a one or zero.)
+	set_state (a_value: NATURAL_32)
 		require
-			is_output_mode: mode = {GPIO_PIN_CONSTANTS}.output
-			valid_signal: a_signal = {GPIO_PIN_CONSTANTS}.Low or a_signal = {GPIO_PIN_CONSTANTS}.High
+			valid_value: a_value = {GPIO_PIN_CONSTANTS}.high or a_value = {GPIO_PIN_CONSTANTS}.low
+		do
+			if a_value = {GPIO_PIN_CONSTANTS}.high then
+				set
+			else
+				clear
+			end
+		end
+
+	set
+			-- Set `state' to High
+		require
+--			is_output_mode: mode = {GPIO_PIN_CONSTANTS}.output
 		local
 			i: INTEGER
 		do
-			pi.gpio.write_signal_on_pin (number, a_signal)
-				-- Give time for state to take
-			from i := 1
-			until state = a_signal or else i > 1000
-			loop
-				i := i + 1
-			end
-			if i > 1000 then
-				print ("GPIO_PIN.set_state (" + a_signal.out + ") = " + state.out + "   error %N")
-			end
+			pi.gpio.set_pin (number)
+				-- Give time for state to take.  NO! may never if not output mode.
 		ensure
-			state_was_set: state = a_signal
+			state_was_set: state = {GPIO_PIN_CONSTANTS}.output implies
+				state = {GPIO_PIN_CONSTANTS}.high
+		end
+
+	clear
+			-- Set `state' to Low
+		require
+--			is_output_mode: mode = {GPIO_PIN_CONSTANTS}.output
+		local
+			i: INTEGER
+		do
+			pi.gpio.clear_pin (number)
+		ensure
+			state_was_set: state = {GPIO_PIN_CONSTANTS}.output implies
+				state = {GPIO_PIN_CONSTANTS}.low
 		end
 
 feature -- Query

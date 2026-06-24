@@ -1,6 +1,7 @@
 note
 	description: "[
-		Represents a "function-select" register in the {PI_CONTROLLER}.
+		Represents a "function-select" register in the {RPI_PROCESSOR}.
+		It defines the operation of the general-purpose I/O pins.
 		]"
 	author: "Jimmy J Johnson"
 	date: "10/11/20"

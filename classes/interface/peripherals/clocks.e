@@ -1,10 +1,10 @@
 note
 	description: "[
-		Contains the clocks in the {PI_CONTROLLER}.
+		Contains the clocks in the {RPI_PROCESSOR}.
 
 		This class encapsulates ALL three GPIO clocks [for the 2711] and the
-		PCM and PWM clocks, because they all are defined from the same base
-		address.
+		PCM and PWM clocks, because they all are defined from the same
+		base address.
 		]"
 	author: "Jimmy J Johnson"
 	date: "10/17/20"

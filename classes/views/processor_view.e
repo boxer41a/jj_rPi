@@ -47,20 +47,22 @@ feature -- Basic operations
 			-- Show information about the `target' (i.e. the RPI)
 		local
 			s: STRING
+			t: like target
 		do
-				-- Build the string
-			s := "%N%N"
-			s := s + "  Processor:  " + target.generating_type.name + "%N"
-			s := s + "%N"
-			s := s + "    Peripheral Base Address:  " + target.peripheral_base_address.to_hex_string + "%N"
-			s := s + "    GPIO offset:  " + target.gpio_offset.to_hex_string + "%N"
-			s := s + "    GPIO Clocks Offset:  " + target.gpio_clocks_offset.to_hex_string + "%N"
-			s := s + "    PWM offset:  " + target.gpio_offset.to_hex_string + "%N"
-			s := s + "%N"
-			s := s + "    is_degraded_mode:  "  + target.is_degraded_mode.out + "%N"
-			s := s + "    is_periferal_inialization_failed:  " + target.is_peripheral_initialization_failed.out + "%N"
-				-- Put it into the view
-			text.set_text (s)
+			t := target
+					-- Build the string
+				s := "%N%N"
+				s := s + "  Processor:  " + create {STRING} .make_from_separate (t.generating_type.name) + "%N"
+				s := s + "%N"
+				s := s + "    Peripheral Base Address:  " + t.peripheral_base_address.to_hex_string + "%N"
+				s := s + "    GPIO offset:  " + t.gpio_offset.to_hex_string + "%N"
+				s := s + "    GPIO Clocks Offset:  " + t.gpio_clocks_offset.to_hex_string + "%N"
+				s := s + "    PWM offset:  " + t.gpio_offset.to_hex_string + "%N"
+				s := s + "%N"
+				s := s + "    is_degraded_mode:  "  + t.is_degraded_mode.out + "%N"
+				s := s + "    is_periferal_inialization_failed:  " + t.is_peripheral_initialization_failed.out + "%N"
+					-- Put it into the view
+				text.set_text (s)
 		end
 
 feature {NONE} -- Implementation

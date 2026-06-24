@@ -88,50 +88,71 @@ feature -- Status report
 feature -- Status setting
 
 	 enable
-			-- Enable the clock generator (i.e. turn it on?)
-			-- Request the clock to start without glitches (i.e. lets the
-			-- cycle complete.  Once complete, the `is_busy' flags goes low.
+			-- Enable the clock generator (i.e. turn it on)
+			-- Request the clock to start after the clock cycle completes.
+			-- Waiting for cycle completion avoids glitches, but requires this feature
+			-- to `wait' for a short time to allow the "busy" bit to become set.
 		local
 			v: NATURAL_32
 			m: NATURAL_32
 		do
 				-- Need to set bit 4 without chaning other settings,
-				-- but can not write the bit 7 (it's read only).
-			v := value
-				-- clear reseved bits and bit 7
-			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
-			m := m.bit_or (busy_mask)
-			v := v.bit_and (m.bit_not)
-			v := v.bit_or (enable_mask)		-- set bit 4
-			set_value (v)
+--				-- but can not write the bit 7 (it's read only).
+--			v := value
+--				-- clear reseved bits and bit 7
+--			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
+--			m := m.bit_or (busy_mask)
+--			v := v.bit_and (m.bit_not)
+--			v := v.bit_or (enable_mask)		-- set bit 4
+--			print ("{CLOCK_CONTROL_REGISTER}.enable:  v = " + v.to_binary_string + "%N")
+--			print ("{CLOCK_CONTROL_REGISTER}.enable:  value = " + value.to_binary_string + "%N")
+--			set_value (v)
+
+				-- Can't we just set bit 4?
+			set_bit (4)
 				-- Wait for the busy bit to actually become set
 			wait (Default_wait, agent is_busy)
+			print ("{CLOCK_CONTROL_REGISTER}.enable:  value = " + value.to_binary_string + "%N")
 		ensure
 			is_enabled: is_enabled
 			is_running: is_busy
 		end
 
 	disable
-			-- Disable the clock generator (i.e. turn it off?)
-			-- Request the clock to stop without glitches (i.e. lets the
-			-- cycle complete.  Once complete, the `is_busy' flags goes low.
+			-- Disable the clock generator (i.e. turn it off)
+			-- Request the clock to stop after the clock cycle completes.
+			-- Waiting for cycle completion avoids glitches, but requires this feature
+			-- to `wait' for a short time to allow the "busy" bit to clear.
 		local
 			v: NATURAL_32
 			m: NATURAL_32
 		do
-				-- Need to clear bit 4, without changing other settings.
-			v := value
-				-- clear reseved bits and bit 7
-			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
-			m := m.bit_or (busy_mask)
-			v := v.bit_and (m.bit_not)
-			v := v.bit_and (enable_mask.bit_not)		-- clears bit 4
-			set_value (v)
+--				-- Need to clear bit 4, without changing other settings.
+--			v := value
+--				-- clear reseved bits and bit 7
+--			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
+--			m := m.bit_or (busy_mask)
+--			v := v.bit_and (m.bit_not)
+--			v := v.bit_and (enable_mask.bit_not)		-- clears bit 4
+--			set_value (v)
+				-- Just clear bit 4
+			clear_bit (4)
 				-- Wait for the busy bit to actually clear
 			wait (Default_wait, agent is_busy)
 		ensure
 			not_enabled: not is_enabled
 			not_running: not is_busy
+		end
+
+	kill
+			-- Stop and reset the clock generator without completing the
+			-- current clock cycle.
+			-- "This is intended for test/debut only.  Using this control [feature]
+			-- may cause a glitch on the clock generator output."
+		do
+			check
+				not_yet_implemented: False then
+			end
 		end
 
 	flip
@@ -228,7 +249,7 @@ feature {NONE} -- Implementation
 		end
 
 feature {NONE} -- Implementation
-	
+
 	Default_wait: NATURAL_32 = 100
 			-- Default time passed to `wait' in microseconds
 
