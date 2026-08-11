@@ -190,11 +190,11 @@ feature -- Element change
 			v: NATURAL_32
 		do
 			v := c_register_value (address)
---			print ("{REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
+			print ("{REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
 			v := v.bit_or (pin_mask (a_index))
---			print ("    {REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
+			print ("    {REGISTER}.set_bit:  v = " + v.to_hex_string + "%N")
 			c_set_register_value (address, v)
---			print ("    {REGISTER}.set_bit:  value = " + value.to_hex_string + "%N")
+			print ("    {REGISTER}.set_bit:  value = " + value.to_hex_string + "%N")
 		end
 
 	clear_bit (a_index: INTEGER_32)

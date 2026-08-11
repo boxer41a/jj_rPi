@@ -1,11 +1,21 @@
 note
 	description: "[
 		Interface to control a small DC motor through a L293D 
-		motor control chip.  This class controls a single motor
+		motor control chip or  a Cytron MD20A. 
+		
+		The Cytron MD20A is the simplest method.  Connect the
+		MD20's pwm to the `pwm_pin', connect the direction pin to
+		eather `pin_1' or `pin_2', and connect the ground to a
+		rPi ground pin.
+		
+		
+		This class controls a single motor
 		by changing the values (high or low) output by two GPIO 
 		pins and the PWM pulse coming from one of the PWM pins
 		(pins 12, 13, 17, or 18).
-		
+
+
+FIX ME!  to match the code		
 		  ***********************
 		1 * Enable 1        VSS * 16
 		2 * Input 1     Input 4 * 15

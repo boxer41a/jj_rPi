@@ -36,18 +36,27 @@ feature {NONE} -- Initialization
 			-- Implemented by descendants to create attached objects
 			-- in order to adhere to void-safety due to the implementation
             -- bridge pattern.
-		do
+ 		do
 			Precursor
 			create address_text
 			create name_text
 			create description_text
 			create value_text
+			create bit_texts.make (0)
 		end
 
 	initialize
 			-- Set up the tool
+       local
+        	i: INTEGER
 		do
 			Precursor
+			from i := 1
+			until i > 32
+			loop
+				bit_texts.extend (create {EV_GRID_LABEL_ITEM}.make_with_text ("9"))
+				i := i + 1
+			end
 		end
 
 feature -- Element change
@@ -66,9 +75,15 @@ feature -- Element change
 				set_item (2, name_text)
 				set_item (3, description_text)
 				set_item (4, value_text)
+--				from i := 1
+--				until i > 32
+--				loop
+--					set_item (3 + i, bit_texts [i])
+--					i := i + 1
+--				end
 					-- set margins
 				from i := 1
-				until i > count
+				until i > 3
 				loop
 					check attached {EV_GRID_LABEL_ITEM}  item (i) as it then
 						it.set_left_border (10)
@@ -91,14 +106,31 @@ feature -- Basic operations
 		do
 			Precursor
 			address_text.set_text (register.address.out)
-			name_text.set_text (create {STRING}.make_from_separate (register.name))
-			description_text.set_text (create {STRING}.make_from_separate (register.description))
+			name_text.set_text (register.name)
+--			name_text.set_text (create {STRING}.make_from_separate (register.name))
+			description_text.set_text (register.description)
+--			description_text.set_text (create {STRING}.make_from_separate (register.description))
 			if register.is_readable then
-				value_text.set_text (create {STRING}.make_from_separate (register.value.to_binary_string))
+--				draw_bits
+--				value_text.set_text (create {STRING}.make_from_separate (register.value.to_binary_string))
+				value_text.set_text (register.value.to_binary_string)
 			end
 		end
 
 feature {NONE} -- Implementation
+
+	draw_bits
+			-- Display each bit value in the register
+		local
+			i: INTEGER
+		do
+			from i := 1
+			until i > 32
+			loop
+				bit_texts [i].set_text (register.bit_value (i - 1).out)
+				i := i + 1
+			end
+		end
 
 	is_items_added: BOOLEAN
 			-- Flag saying that Current contains the text fields.
@@ -116,6 +148,9 @@ feature {NONE} -- Implementation
 
 	value_text: EV_GRID_LABEL_ITEM
 			-- To display the value
+
+	bit_texts: ARRAYED_LIST [EV_GRID_LABEL_ITEM]
+			-- Holds ev_text items for displaying a single bit
 
 	target_imp: detachable REGISTER
 			-- Implementation of the `target' (i.e. the register)

@@ -42,6 +42,7 @@ feature {NONE} -- Initialization
 			-- Set up the view
 		local
 			f: EV_FONT
+			i: INTEGER
 		do
 			Precursor
 			enable_tree
@@ -51,6 +52,13 @@ feature {NONE} -- Initialization
 			column (2).set_title ("Name")
 			column (3).set_title ("Description")
 			column (4).set_title ("Value")
+--			from i := 1
+--			until i > 32
+--			loop
+--				column (3 + i).set_title (" ")
+--				column (3 + i).header_item.set_minimum_width (10)
+--				i := i + 1
+--			end
 		end
 
 feature -- Element change
@@ -99,11 +107,18 @@ feature -- Basic operations
 				from i := 1
 				until i > column_count
 				loop
-					if i /= 2 then
-						column (i).resize_to_content
+					if i /= 3 then
+--						column (i).resize_to_content
 					end
 					i := i + 1
 				end
+--					-- Set column width of bit columns
+--				from i := 1
+--				until i > 32
+--				loop
+--					column (3 + i).set_width (20)
+--					i := i + 1
+--				end
 			end
 		end
 

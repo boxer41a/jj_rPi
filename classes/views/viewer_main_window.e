@@ -35,7 +35,8 @@ feature {NONE} -- Initialization
 		do
 			Precursor {JJ_MAIN_WINDOW}
 			create command_tool_bar
-			create rpi_tool
+--			create sleeper_tool
+			create peripheral_tool
 --			create {PI_4_CONTROLLER} target_imp
 		end
 
@@ -46,9 +47,7 @@ feature {NONE} -- Initialization
 			Precursor {JJ_MAIN_WINDOW}
 			split_manager.disable_mode_changes
 			split_manager.set_vertical
-			split_manager.extend (rpi_tool)
---			split_manager.exend (
---			set_target (target)
+			split_manager.extend (peripheral_tool)
 			set_size (800, 1000)
 			set_position (600, 100)
 		end
@@ -77,7 +76,7 @@ feature -- Element change
 			-- Change the target
 		do
 			Precursor {JJ_MAIN_WINDOW} (a_target)
-			rpi_tool.set_target (a_target)
+			peripheral_tool.set_target (a_target)
 		end
 
 feature -- Basic operations
@@ -109,7 +108,10 @@ feature {NONE} -- Implementation
 
 feature {NONE} -- Implementation
 
-	rpi_tool: PERIPHERAL_TOOL
+--	sleeper_tool: SLEEPER_TOOL
+			-- To control and provide info about the sleeper
+
+	peripheral_tool: PERIPHERAL_TOOL
 			-- Tool in which peripheral information is displayed
 
 	command_tool_bar: EV_HORIZONTAL_BOX

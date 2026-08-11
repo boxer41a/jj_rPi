@@ -96,20 +96,20 @@ feature -- Status setting
 			v: NATURAL_32
 			m: NATURAL_32
 		do
-				-- Need to set bit 4 without chaning other settings,
---				-- but can not write the bit 7 (it's read only).
---			v := value
---				-- clear reseved bits and bit 7
---			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
---			m := m.bit_or (busy_mask)
---			v := v.bit_and (m.bit_not)
---			v := v.bit_or (enable_mask)		-- set bit 4
---			print ("{CLOCK_CONTROL_REGISTER}.enable:  v = " + v.to_binary_string + "%N")
---			print ("{CLOCK_CONTROL_REGISTER}.enable:  value = " + value.to_binary_string + "%N")
---			set_value (v)
-
 				-- Can't we just set bit 4?
-			set_bit (4)
+				--      NO!  There's reserved bitt, password, etc.
+--			set_bit (4)
+				-- Need to set bit 4 without chaning other settings,
+				-- but can not write the bit 7 (it's read only).
+			v := value
+				-- Make `m' to ignore reserve and password bits.
+			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
+			m := m.bit_or (busy_mask)
+			v := v.bit_and (m.bit_not)
+			v := v.bit_or (enable_mask)		-- set bit 4
+			print ("{CLOCK_CONTROL_REGISTER}.enable:  v = " + v.to_binary_string + "%N")
+			set_value (v)		-- this will set the value using a password
+			print ("{CLOCK_CONTROL_REGISTER}.enable:  value = " + value.to_binary_string + "%N")
 				-- Wait for the busy bit to actually become set
 			wait (Default_wait, agent is_busy)
 			print ("{CLOCK_CONTROL_REGISTER}.enable:  value = " + value.to_binary_string + "%N")
@@ -127,16 +127,16 @@ feature -- Status setting
 			v: NATURAL_32
 			m: NATURAL_32
 		do
---				-- Need to clear bit 4, without changing other settings.
---			v := value
---				-- clear reseved bits and bit 7
---			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
---			m := m.bit_or (busy_mask)
---			v := v.bit_and (m.bit_not)
---			v := v.bit_and (enable_mask.bit_not)		-- clears bit 4
---			set_value (v)
-				-- Just clear bit 4
-			clear_bit (4)
+				-- Just clear bit 4...  NO!
+--			clear_bit (4)
+				-- Need to clear bit 4, without changing other settings.
+			v := value
+				-- clear reseved bits and bit 7
+			m := password_mask.bit_or (read_only_mask.bit_or (reserved_mask))
+			m := m.bit_or (busy_mask)
+			v := v.bit_and (m.bit_not)
+			v := v.bit_and (enable_mask.bit_not)		-- clears bit 4
+			set_value (v)		-- Changes the `value' using the password
 				-- Wait for the busy bit to actually clear
 			wait (Default_wait, agent is_busy)
 		ensure
